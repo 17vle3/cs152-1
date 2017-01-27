@@ -1,0 +1,52 @@
+
+(terminals)
+[non-terminal]
+
+
+
+[program] -> [function] [program] | (epsilon)
+
+//[decl_loop]     -> [declaration] (;) [decl_loop] | (epsilon)
+[stmt_loop]     -> [statement] (;) [stmt_loop] | (epsilon)
+
+[function]      ->  (function) (identifier) (;) (begin_params) [function_2] 
+[function_2]    -> [declaration] (;) [function_2] | (end_params) (begin_locals) [function_3]
+[function_3]    -> [declaration] (;) [function_3] | (end_locals) (begin_body) [statement] (;) [function_4]
+[function_4]    -> [statement] (;) [function_4] | (end_body)
+
+[declartion]    -> (identifier) [declaration_2]
+[declaration_2] -> (,) (identifier) [declaration_2] | (;) [declaration_3]
+[declaration_3] -> (integer) | (array) ([) (number) (]) (of)
+
+[statement]     -> [statement_1] | [statement_2]  | [statement_3] | [statement_4] | [statement_5] | [statement_6] | (continue) | (return) (expression)
+[statement_1]   -> [var] (:=) [expression]
+[statement_2]   -> (if) [bool_exp] (then) [statement_21] endif
+[statement_21]  -> [stmt_loop] | (else) [stmt_loop] 
+[statement_3]   -> (while) [bool_exp] (beginloop) [stmt_loop] (endloop)
+[statement_4]   -> (do) (beginloop) [stmt_loop] (endloop) (while) [bool_exp]
+[statement_5]   -> (read) [var] [statement_51]
+[statement_51]  -> (,) [var] [statement_51] | (epsilon) 
+
+[bool_exp]      -> [rel_and_exp] [bool_exp2]
+[bool_exp2]     -> (or) [rel_and_exp] [bool_exp2] | (epsilon)
+
+[relation_exp]  -> [relation_exp_s] | (not) [relation_exp_s]
+[relation_exp_s]-> [expression] [comp] [expression] | (true) | (false) | (() [bool_exp]())
+
+[comp]          -> (==) | (<>) | (<) | (>) | (<=) | (>=)
+
+[expression]    -> [mult_expr] [expression_2]
+[expression_2]  -> (+) [mult_expr] [expression_2] | (-) [mult_expr] [expression_2] | (epsilon)
+
+[mult_expr]     -> [term] [mult_expr_2] 
+[mult_expr_2]   -> (*) [term] [mult_expr] | (/) [term] [mult_expr] | (%) [term] [mult_expr] | (epsilon)
+
+[term]          -> (-) [term_2] | [term_2] | [term_3]
+[term_2]        -> [var] | (number) | (() [expression] ())
+[term_3]        -> (identifier) (() [term_31] ())
+[term_31]       -> [expression] (') [term_31] | (epsilon)
+
+[var]           -> [identifier] [var_2]
+[var_2]         -> ([) [expression] (]) | (epsilon)
+
+
