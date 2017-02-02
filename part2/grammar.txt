@@ -6,17 +6,20 @@
 
 [program] -> [function] [program] | (epsilon)
 
-//[decl_loop]     -> [declaration] (;) [decl_loop] | (epsilon)
+[decl_loop]     -> [declaration] (;) [decl_loop] | (epsilon)
 [stmt_loop]     -> [statement] (;) [stmt_loop] | (epsilon)
 
-[function]      ->  (function) (identifier) (;) (begin_params) [function_2] 
-[function_2]    -> [declaration] (;) [function_2] | (end_params) (begin_locals) [function_3]
-[function_3]    -> [declaration] (;) [function_3] | (end_locals) (begin_body) [statement] (;) [function_4]
-[function_4]    -> [statement] (;) [function_4] | (end_body)
+[function]      ->  (function) (identifier) (;) (begin_params) [decl_loop] (end_params) (begin_locals) [decl_loop] (end_locals) (begin_body) [statement] (;) [function_2]
+[function_2] -> [statement] (;) [function_2] | [end_body] 
+
+//[function]      ->  (function) (identifier) (;) (begin_params) [function_2] 
+//[function_2]    -> [declaration] (;) [function_2] | (end_params) (begin_locals) [function_3]
+//[function_3]    -> [declaration] (;) [function_3] | (end_locals) (begin_body) [statement] (;) [function_4]
+//[function_4]    -> [statement] (;) [function_4] | (end_body)
 
 [declartion]    -> (identifier) [declaration_2]
-[declaration_2] -> (,) (identifier) [declaration_2] | (;) [declaration_3]
-[declaration_3] -> (integer) | (array) ([) (number) (]) (of)
+[declaration_2] -> (,) (identifier) [declaration_2] | (:) [declaration_3] (integer) 
+[declaration_3] -> (array) ([) (number) (]) (of) | (epsilon)
 
 [statement]     -> [statement_1] | [statement_2]  | [statement_3] | [statement_4] | [statement_5] | [statement_6] | (continue) | (return) (expression)
 [statement_1]   -> [var] (:=) [expression]

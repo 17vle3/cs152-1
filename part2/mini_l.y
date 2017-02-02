@@ -26,9 +26,57 @@
 
 %%
 
-program:    function program {printf("PROGRAM -> function program");} | error
+program:    function program {printf("program -> function program");} 
+            | {printf("program -> EPSILON");}
             ;
-function:   FUNCTION IDENT SEMICOLON BEGIN_PARAMS{printf("---------- %s\n", $2);printf("function -> FUNCTION IDENT SEMICOLON BEGIN_PARAMS")}
+
+function:   FUNCTION IDENT SEMICOLON BEGIN_PARAMS decl_loop END_PARAMS BEGIN_LOCALS decl_loop END_LOCALS BEGIN_BODY statement SEMICOLON function_2 {
+        printf("function -> FUNCTION IDENT SEMICOLON BEGIN_PARAMS decl_loop END_PARAMS BEGIN_LOCALS decl_loop END_LOCALS BEGIN_BODY statement SEMICOLON function_2\n");
+        printf("---------- %s\n", $2);
+}
+            ;
+
+function_2: statement SEMICOLON function_2 {printf("function_2 -> statement SEMICOLON function_2\n");} 
+            | END_BODY {printf("function_2 -> END_BODY\n");}
+            ;
+
+decl_loop:  declaration SEMICOLON decl_loop {printf("decl_loop -> declaration SEMICOLON decl_loop\n");} 
+            | {printf("decl_loop -> EPSILON\n");}
+            ;
+
+stmt_loop:  statement SEMICOLON stmt_loop {printf("stmt_loop -> statement SEMICOLON stmt_loop\n");} 
+            | {printf("stmt_loop -> EPSILON\n");}
+            ;
+
+declaration:    IDENT declaration_2 {
+                printf("declaration -> IDENT declaration_2\n");
+                printf("---------- %s\n", $1);
+                }
+                ;
+
+declaration_2:  COMMA IDENT declaration_2 {
+                printf("declaration_2 -> COMMA IDENT declaration_2\n");
+                printf("---------- %s\n", $2);
+                }
+                | COLON declaration_3 INTEGER {
+                    printf("declaration_2 -> COLON declaration_3 INTEGER\n");
+                }
+                ;
+
+declaration_3:  {printf("declaration_3 -> EPSILON\n");}
+                | ARRAY L_SQUARE_BRACKET NUMBER R_SQUARE_BRACKET OF{
+                    printf("declaration_3 -> ARRAY L_SQUARE_BRACKET NUMBER R_SQUARE_BRACKET OF\n");
+                }
+                ;
+
+statement:      statement_1 
+                | statement_2 
+                | statement_3 
+                | statement_4 
+                | statement_5 
+                | statement_6 
+                | CONTINUE 
+                | 
 
             
 %%
