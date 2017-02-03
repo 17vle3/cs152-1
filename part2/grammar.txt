@@ -21,7 +21,7 @@
 [declaration_2] -> (,) (identifier) [declaration_2] | (:) [declaration_3] (integer) 
 [declaration_3] -> (array) ([) (number) (]) (of) | (epsilon)
 
-[statement]     -> [statement_1] | [statement_2]  | [statement_3] | [statement_4] | [statement_5] | [statement_6] | (continue) | (return) (expression)
+[statement]     -> [statement_1] | [statement_2]  | [statement_3] | [statement_4] | [statement_5] | [statement_6] | (continue) | (return) [expression]
 [statement_1]   -> [var] (:=) [expression]
 [statement_2]   -> (if) [bool_exp] (then) [statement_21] endif
 [statement_21]  -> [stmt_loop] | (else) [stmt_loop] 
@@ -32,6 +32,9 @@
 
 [bool_exp]      -> [rel_and_exp] [bool_exp2]
 [bool_exp2]     -> (or) [rel_and_exp] [bool_exp2] | (epsilon)
+
+[rel_and_exp]   -> [relation_exp] [rel_and_exp2] 
+[rel_and_exp2]  -> (and) [relation_exp] [rel_and_exp2] | (epsilon)
 
 [relation_exp]  -> [relation_exp_s] | (not) [relation_exp_s]
 [relation_exp_s]-> [expression] [comp] [expression] | (true) | (false) | (() [bool_exp]())

@@ -16,7 +16,7 @@
 %token FUNCTION BEGIN_PARAMS END_PARAMS BEGIN_LOCALS END_LOCALS BEGIN_BODY END_BODY
 %token INTEGER ARRAY OF 
 %token IF THEN ENDIF ELSE WHILE DO BEGINLOOP ENDLOOP CONTINUE 
-%token READ WRITE 
+%token READ WRITE RETURN
 %token AND OR NOT TRUE FALSE 
 %token SUB ADD MULT DIV MOD EQ NEQ LT GT LTE GTE 
 %token SEMICOLON COLON COMMA L_PAREN R_PAREN L_SQUARE_BRACKET R_SQUARE_BRACKET ASSIGN NUMBER
@@ -76,7 +76,49 @@ statement:      statement_1
                 | statement_5 
                 | statement_6 
                 | CONTINUE 
+                | RETURN expression
+
+statement_1:    var ASSIGN expression
+
+statement_2:    IF bool_exp THEN statement_21 ENDIF
+
+statement_21:   stmt_loop ELSE stmt_loop
+
+statement_3:    WHILE bool_exp BEGINLOOP stmt_loop ENDLOOP
+
+statement_4:    DO BEGINLOOP stmt_loop ENDLOOP WHILE bool_exp
+
+statement_5:    READ var statement_51
+
+statement_51:   COMMA var statement_51 
                 | 
+
+bool_exp:       rel_and_exp bool_exp2
+
+bool_exp2:      OR rel_and_exp bool_exp2
+                |
+
+rel_and_exp:    relation_exp rel_and_exp2
+
+rel_and_exp2:   AND relation_exp rel_and_exp2
+                |
+
+relation_exp:   relation_exp_s
+                | NOT relation_exp_s
+
+relation_exp_s: expression comp expression
+                | TRUE
+                | FALSE
+                | L_PAREN bool_exp R_PAREN
+
+comp:           EQ
+                | NEQ
+                | LT
+                | GT
+                | LTE
+                | GTE
+
+expression:
 
             
 %%
