@@ -118,6 +118,13 @@ statement_51:   COMMA var statement_51 {
                 | {printf("statement_51 -> EPSILON\n");}
                 ;
 
+statement_6:    WRITE var statement_61{printf("statement -> WRITE var statement_61\n");}
+                ;
+
+statement_61:   COMMA var statement_6{printf("statement_61 -> COMMA var statement_6\n");}
+                |{printf("statement_61 -> EPSILON\n");}
+                ;
+
 bool_exp:       rel_and_exp bool_exp2{
                 printf("bool_exp -> rel_and_exp bool_exp2\n");
                 }

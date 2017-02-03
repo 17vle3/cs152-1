@@ -29,6 +29,8 @@
 [statement_4]   -> (do) (beginloop) [stmt_loop] (endloop) (while) [bool_exp]
 [statement_5]   -> (read) [var] [statement_51]
 [statement_51]  -> (,) [var] [statement_51] | (epsilon) 
+[statement_6]   -> (write) [var] [statement_61]
+[statement_61]  -> (,) [var] [statement_61] | (epsilon)
 
 [bool_exp]      -> [rel_and_exp] [bool_exp2]
 [bool_exp2]     -> (or) [rel_and_exp] [bool_exp2] | (epsilon)
