@@ -66,6 +66,7 @@ false		        printf("FALSE\n");cursor_pos += yyleng;
 \[		            printf("L_SQUARE_BRACKET\n");cursor_pos += yyleng;
 \]		            printf("R_SQUARE_BRACKET\n");cursor_pos += yyleng;
 \:\=		        printf("ASSIGN\n");cursor_pos += yyleng;
+return              printf("RETURN\n");cursor_pos += yyleng;
 {IDENT_DIG}	        printf("NUMBER %s\n",yytext);cursor_pos += yyleng; 
 {IDENT_ERR_START}   fprintf(stderr,"Error at line %d, column %d: identifier \"%s\" must begin with a letter\n",line_cnt,cursor_pos,yytext);exit(0);
 {IDENT_ERR_END}	    fprintf(stderr,"Error at line %d, column %d: identifier \"%s\" cannot end with an underscore\n",line_cnt,cursor_pos,yytext);exit(0);
