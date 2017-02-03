@@ -50,9 +50,9 @@
 [term]          -> (-) [term_2] | [term_2] | [term_3]
 [term_2]        -> [var] | (number) | (() [expression] ())
 [term_3]        -> (identifier) (() [term_31] ())
-[term_31]       -> [expression] (') [term_31] | (epsilon)
+[term_31]       -> [expression] (,) [term_31] | (epsilon)
 
-[var]           -> [identifier] [var_2]
+[var]           -> (identifier) [var_2]
 [var_2]         -> ([) [expression] (]) | (epsilon)
 
 

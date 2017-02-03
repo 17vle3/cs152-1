@@ -75,63 +75,151 @@ statement:      statement_1
                 | statement_4 
                 | statement_5 
                 | statement_6 
-                | CONTINUE 
-                | RETURN expression
+                | CONTINUE{
+                    printf("statement -> CONTINUE\n");
+                }
+                | RETURN expression{
+                    printf("statement -> RETURN expression\n");
+                }
 
-statement_1:    var ASSIGN expression
+statement_1:    var ASSIGN expression{
+                printf("statement -> var ASSIGN expression");
+                }
+                ;
 
-statement_2:    IF bool_exp THEN statement_21 ENDIF
+statement_2:    IF bool_exp THEN statement_21 ENDIF{
+                printf("statement -> IF bool_exp THEN statement_21 ENDIF\n");
+                }
+                ;
 
-statement_21:   stmt_loop ELSE stmt_loop
+statement_21:   stmt_loop ELSE stmt_loop{
+                printf("statement -> stmt_loop ELSE stmt_loop\n");
+                }
+                ;
 
-statement_3:    WHILE bool_exp BEGINLOOP stmt_loop ENDLOOP
+statement_3:    WHILE bool_exp BEGINLOOP stmt_loop ENDLOOP{
+                printf("statement -> WHILE bool_exp BEGINLOOP stmt_loop ENDLOOP\n");
+                }
+                ;
 
-statement_4:    DO BEGINLOOP stmt_loop ENDLOOP WHILE bool_exp
+statement_4:    DO BEGINLOOP stmt_loop ENDLOOP WHILE bool_exp{
+                printf("statement -> DO BEGINLOOP stmt_loop ENDLOOP WHILE bool_exp\n");
+                }
+                ;
 
-statement_5:    READ var statement_51
+statement_5:    READ var statement_51{
+                printf("statement -> READ var statement_51\n");
+                }
+                ;
 
-statement_51:   COMMA var statement_51 
-                | 
+statement_51:   COMMA var statement_51 {
+                printf("statement_51 -> COMMA var statement_51\n");
+                }
+                | {printf("statement_51 -> EPSILON\n");}
+                ;
 
-bool_exp:       rel_and_exp bool_exp2
+bool_exp:       rel_and_exp bool_exp2{
+                printf("bool_exp -> rel_and_exp bool_exp2\n");
+                }
+                ;
 
-bool_exp2:      OR rel_and_exp bool_exp2
-                |
+bool_exp2:      OR rel_and_exp bool_exp2{
+                printf("bool_exp2 -> OR rel_and_exp bool_exp2\n");
+                }
+                |{printf("bool_exp2 -> EPSILON\n");}
+                ; 
 
-rel_and_exp:    relation_exp rel_and_exp2
+rel_and_exp:    relation_exp rel_and_exp2{
+                printf("rel_and_exp -> relation_exp rel_and_exp2\n");
+                }
+                ;
 
-rel_and_exp2:   AND relation_exp rel_and_exp2
-                |
+rel_and_exp2:   AND relation_exp rel_and_exp2{
+                printf("rel_and_exp2 -> AND relation_exp rel_and_exp2\n");
+                }
+                |{printf("rel_and_exp2 -> EPSILON\n");}
+                ;
 
-relation_exp:   relation_exp_s
-                | NOT relation_exp_s
+relation_exp:   relation_exp_s{
+                printf("relation_exp -> relation_exp_s\n");
+                }
+                | NOT relation_exp_s{
+                printf("relation_exp -> NOT relation_exp_s\n");
+                }
+                ;
 
-relation_exp_s: expression comp expression
-                | TRUE
-                | FALSE
-                | L_PAREN bool_exp R_PAREN
+relation_exp_s: expression comp expression{
+                printf("relation_exp_s -> expression comp expression\n");
+                }
+                | TRUE{printf("relation_exp_s -> TRUE\n");}
+                | FALSE{printf("relation_exp_s -> FALSE\n");}
+                | L_PAREN bool_exp R_PAREN{
+                printf("relation_exp_s -> L_PAREN bool_exp R_PAREN\n");
+                }
+                ;
 
-comp:           EQ
-                | NEQ
-                | LT
-                | GT
-                | LTE
-                | GTE
+comp:           EQ{printf("comp -> EQ\n");}
+                | NEQ{printf("comp -> NEQ\n");}
+                | LT{printf("comp -> LT\n");}
+                | GT{printf("comp -> GT\n");}
+                | LTE{printf("comp -> LTE\n");}
+                | GTE{printf("comp -> GTE\n");}
+                ;
 
-expression:
+expression:     mult_expr expression_2{printf("expression -> mult_expr expression_2\n");}
+                ;
 
+expression_2:   ADD mult_expr expression_2 {printf("expression_2 -> ADD mult_expr expression_2\n");}
+                | SUB mult_expr expression_2{printf("expression_2 -> SUB mult_expr expression_2\n");}
+                | {printf("expression -> EPSILON");}
+                ;
+
+mult_expr:      term mult_expr_2{printf("mult_expr -> term mult_expr_2\n");}
+                ;
+
+mult_expr_2:    MULT term mult_expr{printf("mult_expr_2 -> MULT term mult_expr\n");}
+                | DIV term mult_expr{printf("mult_expr_2 -> DIV term mult_expr\n");}
+                | MOD term mult_expr{printf("mult_expr_2 -> MOD term mult_expr\n");}
+                |{printf("mult_expr_2 -> EPSILON\n");}
+                ;
+
+term:           SUB term_2{printf("term -> SUB term_2\n");}
+                | term_2{printf("term -> term_2\n");}
+                | term_3{printf("term -> term_3\n");}
+                ;
+
+term_2:         var{printf("term_2 -> var\n");}
+                | NUMBER{printf("term_2 -> NUMBER\n");}
+                | L_PAREN expression R_PAREN{printf("term_2 -> L_PAREN expression R_PAREN\n");}
+                ;
+
+term_3:         IDENT L_PAREN term_31 R_PAREN{printf("term_3 -> IDENT L_PAREN term_31 R_PAREN\n");}
+                ;
+
+term_31:        expression COMMA term_31{printf("term_31 -> expression COMMA term_31\n");}
+                | {printf("term_31 -> EPSILON\n");}
+                ;
+
+var:            IDENT var_2{printf("var -> IDENT var_2\n");}
+                ;
+
+var_2:          L_SQUARE_BRACKET expression R_SQUARE_BRACKET{
+                printf("var_2 -> L_SQUARE_BRACKET expression R_SQUARE_BRACKET\n");
+                }
+                |{printf("var_2 -> EPSILON\n");}
+                ;
             
 %%
 
-//int yyerror(string s)
-//{
-//      extern int yylineno;  // defined and maintained in lex.c
-//        extern char *yytext;    // defined and maintained in lex.c
-//          
-//            cerr << "ERROR: " << s << " at symbol \"" << yytext;
-//              cerr << "\" on line " << yylineno << endl;
-//                exit(1);
-//}
+int yyerror(string s)
+{
+      extern int yylineno;  // defined and maintained in lex.c
+        extern char *yytext;    // defined and maintained in lex.c
+          
+            cerr << "ERROR: " << s << " at symbol \"" << yytext;
+              cerr << "\" on line " << yylineno << endl;
+                exit(1);
+}
 
 int yyerror(char *s)
 {
