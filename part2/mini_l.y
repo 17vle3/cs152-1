@@ -19,10 +19,9 @@
 %token READ WRITE RETURN
 %token AND OR NOT TRUE FALSE 
 %token SUB ADD MULT DIV MOD EQ NEQ LT GT LTE GTE 
-%token SEMICOLON COLON COMMA L_PAREN R_PAREN L_SQUARE_BRACKET R_SQUARE_BRACKET ASSIGN NUMBER
-
-%type <int_val> NUMBER
-%type <str_val> IDENT
+%token SEMICOLON COLON COMMA L_PAREN R_PAREN L_SQUARE_BRACKET R_SQUARE_BRACKET ASSIGN
+%token NUMBER
+%token IDENT
 
 %%
 
@@ -32,7 +31,7 @@ program:    function program {printf("program -> function program");}
 
 function:   FUNCTION IDENT SEMICOLON BEGIN_PARAMS decl_loop END_PARAMS BEGIN_LOCALS decl_loop END_LOCALS BEGIN_BODY statement SEMICOLON function_2 {
         printf("function -> FUNCTION IDENT SEMICOLON BEGIN_PARAMS decl_loop END_PARAMS BEGIN_LOCALS decl_loop END_LOCALS BEGIN_BODY statement SEMICOLON function_2\n");
-        printf("---------- %s\n", $2);
+        //printf("---------- %s\n", $2);
 }
             ;
 
@@ -50,13 +49,13 @@ stmt_loop:  statement SEMICOLON stmt_loop {printf("stmt_loop -> statement SEMICO
 
 declaration:    IDENT declaration_2 {
                 printf("declaration -> IDENT declaration_2\n");
-                printf("---------- %s\n", $1);
+                //printf("---------- %s\n", $1);
                 }
                 ;
 
 declaration_2:  COMMA IDENT declaration_2 {
                 printf("declaration_2 -> COMMA IDENT declaration_2\n");
-                printf("---------- %s\n", $2);
+                //printf("---------- %s\n", $2);
                 }
                 | COLON declaration_3 INTEGER {
                     printf("declaration_2 -> COLON declaration_3 INTEGER\n");
