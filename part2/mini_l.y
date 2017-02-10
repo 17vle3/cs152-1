@@ -38,7 +38,7 @@ program:    function program {printf("program -> function program\n");}
 
 function:   FUNCTION IDENT SEMICOLON BEGIN_PARAMS decl_loop END_PARAMS BEGIN_LOCALS decl_loop END_LOCALS BEGIN_BODY statement SEMICOLON function_2 {
         printf("function -> FUNCTION IDENT SEMICOLON BEGIN_PARAMS decl_loop END_PARAMS BEGIN_LOCALS decl_loop END_LOCALS BEGIN_BODY statement SEMICOLON function_2\n");
-        //printf("---------- %s\n", $2);
+        //printf("---------- IDENT -> %s\n", $2);
 }
             ;
 
@@ -56,13 +56,13 @@ stmt_loop:  statement SEMICOLON stmt_loop {printf("stmt_loop -> statement SEMICO
 
 declaration:    IDENT declaration_2 {
                 printf("declaration -> IDENT declaration_2\n");
-                //printf("---------- %s\n", $1);
+                //printf("---------- IDENT -> %s\n", $1);
                 }
                 ;
 
 declaration_2:  COMMA IDENT declaration_2 {
                 printf("declaration_2 -> COMMA IDENT declaration_2\n");
-                //printf("---------- %s\n", $2);
+                //printf("---------- IDENT -> %s\n", $2);
                 }
                 | COLON declaration_3 INTEGER {
                     printf("declaration_2 -> COLON declaration_3 INTEGER\n");
@@ -128,7 +128,7 @@ statement_51:   COMMA var statement_51 {
 statement_6:    WRITE var statement_61{printf("statement -> WRITE var statement_61\n");}
                 ;
 
-statement_61:   COMMA var statement_6{printf("statement_61 -> COMMA var statement_6\n");}
+statement_61:   COMMA var statement_61{printf("statement_61 -> COMMA var statement_61\n");}
                 |{printf("statement_61 -> EPSILON\n");}
                 ;
 
@@ -207,7 +207,10 @@ term_2:         var{printf("term_2 -> var\n");}
                 | L_PAREN expression R_PAREN{printf("term_2 -> L_PAREN expression R_PAREN\n");}
                 ;
 
-term_3:         IDENT L_PAREN term_31 R_PAREN{printf("term_3 -> IDENT L_PAREN term_31 R_PAREN\n");}
+term_3:         IDENT L_PAREN term_31 R_PAREN{
+                printf("term_3 -> IDENT L_PAREN term_31 R_PAREN\n");
+                //printf("---------- IDENT -> %s\n", $1);
+                }
                 ;
 
 term_31:        expression term_32{printf("term_31-> expression term_32\n");} | {printf("term_31 -> EPSILON\n");}
@@ -218,7 +221,10 @@ term_32:        COMMA term_31{printf("term_32 -> COMMA term_31\n");} | {printf("
 //                | {printf("term_31 -> EPSILON\n");}
 //                ;
 
-var:            IDENT var_2{printf("var -> IDENT var_2\n");}
+var:            IDENT var_2{
+                printf("var -> IDENT var_2\n");
+                //printf("---------- IDENT -> %s\n", $1);
+                }
                 ;
 
 var_2:          L_SQUARE_BRACKET expression R_SQUARE_BRACKET{
@@ -232,6 +238,7 @@ var_2:          L_SQUARE_BRACKET expression R_SQUARE_BRACKET{
 int main(int argc, char **argv) {
     if ( (argc > 1) && (yyin = fopen(argv[1],"r")) == NULL){
         printf("syntax: %s filename\n", argv[0]);
+        return 1;
     }
     yyparse();
     return 0;
@@ -251,7 +258,7 @@ int main(int argc, char **argv) {
 
 int yyerror(char *s)
 {
-    printf("** Line %d, position %d: %s\n",line_cnt,cursor_pos,s);
+    printf("***** Line %d, position %d: %s\n",line_cnt,cursor_pos,s);
     //return yyerror(string(s));
 }
 
