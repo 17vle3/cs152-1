@@ -10,7 +10,7 @@
 [stmt_loop]     -> [statement] (;) [stmt_loop] | (epsilon)
 
 [function]      ->  (function) (identifier) (;) (begin_params) [decl_loop] (end_params) (begin_locals) [decl_loop] (end_locals) (begin_body) [statement] (;) [function_2]
-[function_2] -> [statement] (;) [function_2] | [end_body] 
+[function_2]    -> [statement] (;) [function_2] | [end_body] 
 
 [declartion]    -> (identifier) [declaration_2]
 [declaration_2] -> (,) (identifier) [declaration_2] | (:) [declaration_3] (integer) 
@@ -42,12 +42,15 @@
 [expression_2]  -> (+) [mult_expr] [expression_2] | (-) [mult_expr] [expression_2] | (epsilon)
 
 [mult_expr]     -> [term] [mult_expr_2] 
-[mult_expr_2]   -> (*) [term] [mult_expr] | (/) [term] [mult_expr] | (%) [term] [mult_expr] | (epsilon)
+[mult_expr_2]   -> (*) [mult_expr] | (/) [mult_expr] | (%) [mult_expr] | (epsilon)
 
 [term]          -> (-) [term_2] | [term_2] | [term_3]
 [term_2]        -> [var] | (number) | (() [expression] ())
 [term_3]        -> (identifier) (() [term_31] ())
-[term_31]       -> [expression] (,) [term_31] | (epsilon)
+[term_31]       -> [expression] [term_32] | (epsilon)
+[term_32]       -> (,) [term_31] | (epsilon)
+
+//[term_31]       -> [expression] (,) [term_31] | (epsilon)
 
 [var]           -> (identifier) [var_2]
 [var_2]         -> ([) [expression] (]) | (epsilon)

@@ -183,9 +183,9 @@ expression_2:   ADD mult_expr expression_2 {printf("expression_2 -> ADD mult_exp
 mult_expr:      term mult_expr_2{printf("mult_expr -> term mult_expr_2\n");}
                 ;
 
-mult_expr_2:    MULT term mult_expr{printf("mult_expr_2 -> MULT term mult_expr\n");}
-                | DIV term mult_expr{printf("mult_expr_2 -> DIV term mult_expr\n");}
-                | MOD term mult_expr{printf("mult_expr_2 -> MOD term mult_expr\n");}
+mult_expr_2:    MULT mult_expr{printf("mult_expr_2 -> MULT mult_expr\n");}
+                | DIV mult_expr{printf("mult_expr_2 -> DIV mult_expr\n");}
+                | MOD mult_expr{printf("mult_expr_2 -> MOD mult_expr\n");}
                 |{printf("mult_expr_2 -> EPSILON\n");}
                 ;
 
@@ -202,9 +202,13 @@ term_2:         var{printf("term_2 -> var\n");}
 term_3:         IDENT L_PAREN term_31 R_PAREN{printf("term_3 -> IDENT L_PAREN term_31 R_PAREN\n");}
                 ;
 
-term_31:        expression COMMA term_31{printf("term_31 -> expression COMMA term_31\n");}
-                | {printf("term_31 -> EPSILON\n");}
+term_31:        expression term_32{printf("term_31-> expression term_32");} | {printf("term_31 -> EPSILON");}
                 ;
+term_32:        COMMA term_31{printf("term_32 -> COMMA term_31");} | {printf("term_32 -> EPSILON");}
+
+//term_31:        expression COMMA term_31{printf("term_31 -> expression COMMA term_31\n");}
+//                | {printf("term_31 -> EPSILON\n");}
+//                ;
 
 var:            IDENT var_2{printf("var -> IDENT var_2\n");}
                 ;
