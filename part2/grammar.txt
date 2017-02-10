@@ -18,8 +18,8 @@
 
 [statement]     -> [statement_1] | [statement_2]  | [statement_3] | [statement_4] | [statement_5] | [statement_6] | (continue) | (return) [expression]
 [statement_1]   -> [var] (:=) [expression]
-[statement_2]   -> (if) [bool_exp] (then) [statement_21] endif
-[statement_21]  -> [stmt_loop] | (else) [stmt_loop] 
+[statement_2]   -> (if) [bool_exp] (then) [stmt_loop] [statement_21] endif
+[statement_21]  -> [(else) [stmt_loop] | (epsilon)
 [statement_3]   -> (while) [bool_exp] (beginloop) [stmt_loop] (endloop)
 [statement_4]   -> (do) (beginloop) [stmt_loop] (endloop) (while) [bool_exp]
 [statement_5]   -> (read) [var] [statement_51]

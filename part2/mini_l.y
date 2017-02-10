@@ -32,8 +32,8 @@ FILE * yyin;
 
 %%
 
-program:    function program {printf("program -> function program");} 
-            | {printf("program -> EPSILON");}
+program:    function program {printf("program -> function program\n");} 
+            | {printf("program -> EPSILON\n");}
             ;
 
 function:   FUNCTION IDENT SEMICOLON BEGIN_PARAMS decl_loop END_PARAMS BEGIN_LOCALS decl_loop END_LOCALS BEGIN_BODY statement SEMICOLON function_2 {
@@ -89,17 +89,18 @@ statement:      statement_1
                 }
 
 statement_1:    var ASSIGN expression{
-                printf("statement -> var ASSIGN expression");
+                printf("statement -> var ASSIGN expression\n");
                 }
                 ;
 
-statement_2:    IF bool_exp THEN statement_21 ENDIF{
-                printf("statement -> IF bool_exp THEN statement_21 ENDIF\n");
+statement_2:    IF bool_exp THEN stmt_loop statement_21 ENDIF{
+                printf("statement -> IF bool_exp THEN stmt_loop statement_21 ENDIF\n");
                 }
                 ;
 
-statement_21:   stmt_loop ELSE stmt_loop{
-                printf("statement -> stmt_loop ELSE stmt_loop\n");
+statement_21:   {printf("statement_21 -> EPSILON\n");}
+                | ELSE stmt_loop{
+                printf("statement_21 -> ELSE stmt_loop\n");
                 }
                 ;
 
@@ -184,7 +185,7 @@ expression:     mult_expr expression_2{printf("expression -> mult_expr expressio
 
 expression_2:   ADD mult_expr expression_2 {printf("expression_2 -> ADD mult_expr expression_2\n");}
                 | SUB mult_expr expression_2{printf("expression_2 -> SUB mult_expr expression_2\n");}
-                | {printf("expression -> EPSILON");}
+                | {printf("expression -> EPSILON\n");}
                 ;
 
 mult_expr:      term mult_expr_2{printf("mult_expr -> term mult_expr_2\n");}
@@ -209,9 +210,9 @@ term_2:         var{printf("term_2 -> var\n");}
 term_3:         IDENT L_PAREN term_31 R_PAREN{printf("term_3 -> IDENT L_PAREN term_31 R_PAREN\n");}
                 ;
 
-term_31:        expression term_32{printf("term_31-> expression term_32");} | {printf("term_31 -> EPSILON");}
+term_31:        expression term_32{printf("term_31-> expression term_32\n");} | {printf("term_31 -> EPSILON\n");}
                 ;
-term_32:        COMMA term_31{printf("term_32 -> COMMA term_31");} | {printf("term_32 -> EPSILON");}
+term_32:        COMMA term_31{printf("term_32 -> COMMA term_31\n");} | {printf("term_32 -> EPSILON\n");}
 
 //term_31:        expression COMMA term_31{printf("term_31 -> expression COMMA term_31\n");}
 //                | {printf("term_31 -> EPSILON\n");}
