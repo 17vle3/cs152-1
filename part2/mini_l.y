@@ -2,14 +2,19 @@
 /* calc.y */
 
 %{
-#include "heading.h"
-    int yyerror(char *s);
-    int yylex(void);
-    %}
+#include <stdio.h>
+#include <stdlib.h>
+int yyparse();
+int yyerror(char *s);
+int yylex(void);
+extern int line_cnt;
+extern int cursor_pos;
+FILE * yyin;
+%}
 
 %union{
-      int       int_val;
-        string* op_val;
+    int       int_val;
+    char str_val[256];
 }
 
 %error-verbose
@@ -20,8 +25,10 @@
 %token AND OR NOT TRUE FALSE 
 %token SUB ADD MULT DIV MOD EQ NEQ LT GT LTE GTE 
 %token SEMICOLON COLON COMMA L_PAREN R_PAREN L_SQUARE_BRACKET R_SQUARE_BRACKET ASSIGN
-%token NUMBER
-%token IDENT
+%token NUMBER IDENT
+
+%type <int_val> NUMBER
+%type <str_val> IDENT
 
 %%
 
@@ -221,19 +228,30 @@ var_2:          L_SQUARE_BRACKET expression R_SQUARE_BRACKET{
             
 %%
 
-int yyerror(string s)
-{
-      extern int yylineno;  // defined and maintained in lex.c
-        extern char *yytext;    // defined and maintained in lex.c
-          
-            cerr << "ERROR: " << s << " at symbol \"" << yytext;
-              cerr << "\" on line " << yylineno << endl;
-                exit(1);
+int main(int argc, char **argv) {
+    if ( (argc > 1) && (yyin = fopen(argv[1],"r")) == NULL){
+        printf("syntax: %s filename\n", argv[0]);
+    }
+    yyparse();
+    return 0;
 }
+
+//
+//int main(int argc, char **argv)
+//{
+//    if ((argc > 1) && (freopen(argv[1], "r", stdin) == NULL))
+//    {
+//        cerr << argv[0] << ": File " << argv[1] << " cannot be opened.\n";
+//        exit( 1 );
+//    }
+//yyparse();
+//return 0;
+//}
 
 int yyerror(char *s)
 {
-      return yyerror(string(s));
+    printf("** Line %d, position %d: %s\n",line_cnt,cursor_pos,s);
+    //return yyerror(string(s));
 }
 
 
