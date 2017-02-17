@@ -13,7 +13,6 @@ t : array [20] of integer;
 endlocals
 
 beginbody    ## main program
-
 read i, j;
 
 k := 0;

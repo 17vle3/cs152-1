@@ -3,12 +3,10 @@
 
 %{
 #include <stdio.h>
-#include <stdlib.h>
+#define YY_NO_UNPUT
 int yyparse();
 int yyerror(char *s);
 int yylex(void);
-extern int line_cnt;
-extern int cursor_pos;
 FILE * yyin;
 %}
 
@@ -69,10 +67,10 @@ declaration_2:  COMMA IDENT declaration_2 {
                 }
                 ;
 
-declaration_3:  {printf("declaration_3 -> EPSILON\n");}
-                | ARRAY L_SQUARE_BRACKET NUMBER R_SQUARE_BRACKET OF{
+declaration_3:  ARRAY L_SQUARE_BRACKET NUMBER R_SQUARE_BRACKET OF{
                     printf("declaration_3 -> ARRAY L_SQUARE_BRACKET NUMBER R_SQUARE_BRACKET OF\n");
                 }
+                | {printf("declaration_3 -> EPSILON\n");}
                 ;
 
 statement:      statement_1 
@@ -258,7 +256,9 @@ int main(int argc, char **argv) {
 
 int yyerror(char *s)
 {
-    printf("***** Line %d, position %d: %s\n",line_cnt,cursor_pos,s);
+extern int line_cnt;
+extern int cursor_pos;
+    fprintf(stderr,"** Line %d, position %d: %s\n",line_cnt,cursor_pos,s);
     //return yyerror(string(s));
 }
 
