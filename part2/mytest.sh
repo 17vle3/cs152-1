@@ -13,7 +13,7 @@ while read -r file; do
     echo "test: $fileName"
     if [ "$isError" != "$fileName" ];then
         #echo "ERROR File"
-        cat "$inFolder/$file" | parser 2> "$outFolder/$fileName".output >/dev/null
+        cat "$inFolder/$file" | parser > "$outFolder/$fileName".output 2>&1
     else
         cat "$inFolder/$file" | parser > "$outFolder/$fileName".output
     fi
