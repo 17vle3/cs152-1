@@ -1,7 +1,9 @@
 
-part2/y.tab.c 
-part2/y.tab.h 
-part2/y.output 
-part2/lex.yy.c 
+part2/lex.yy.c
+part2/y.output
+part2/y.tab.c
+part2/y.tab.h
+
+
 part2/parser
 part2/out/*
