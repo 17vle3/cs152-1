@@ -258,7 +258,7 @@ int yyerror(char *s)
 {
 extern int line_cnt;
 extern int cursor_pos;
-    printf("Line %d, position %d: %s\n",line_cnt,cursor_pos,s);
+    printf(">>> Line %d, position %d: %s\n",line_cnt,cursor_pos,s);
     //return yyerror(string(s));
 }
 

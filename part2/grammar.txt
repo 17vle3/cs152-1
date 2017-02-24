@@ -1,7 +1,5 @@
-
 (terminals)
 [non-terminal]
-
 
 
 [program] -> [function] [program] | (epsilon)
@@ -49,8 +47,6 @@
 [term_3]        -> (identifier) (() [term_31] ())
 [term_31]       -> [expression] [term_32] | (epsilon)
 [term_32]       -> (,) [term_31] | (epsilon)
-
-//[term_31]       -> [expression] (,) [term_31] | (epsilon)
 
 [var]           -> (identifier) [var_2]
 [var_2]         -> ([) [expression] (]) | (epsilon)
