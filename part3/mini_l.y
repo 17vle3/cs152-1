@@ -2,29 +2,51 @@
 /* calc.y */
 
 %{
-#include <stdio.h>
-#define YY_NO_UNPUT
-int yyparse();
+#include "heading.h"
+//#include <stdio.h>
+//#define YY_NO_UNPUT
+//int yyparse();
 int yyerror(char *s);
 int yylex(void);
-FILE * yyin;
+//FILE * yyin;
 %}
 
 %union{
     int       int_val;
     char str_val[256];
+
+    enum Type {INT, INT_ARR};
+
     struct {
-        char name[3000];
-        char code[3000];
-        struct Terminal *begin;
-        struct Terminal *after;
-    } Terminal;
+        stringstream *code;
+    }NonTerminal;
+
     struct {
-        char *value;
-    } NonTerminal;
+       stringstream *code;
+       //location
+       string *place;
+       string *offset;
+       // branches
+       string *condition;
+       string *begin;
+       string *end;
+       // type
+       Type type;
+       uint length;
+       // idents and vars
+       vector<string> *ids;
+       //vector<> *vars;
+               
+    } Statement;
 }
 
 %error-verbose
+//%skeleton "lalr1.cc"
+//%require "3.0.4"
+//%define api.token.constructor
+//%define api.value.type variant
+//%define parse.assert
+
 %token FUNCTION BEGIN_PARAMS END_PARAMS BEGIN_LOCALS END_LOCALS BEGIN_BODY END_BODY
 %token INTEGER ARRAY OF 
 %token IF THEN ENDIF ELSE WHILE DO BEGINLOOP ENDLOOP CONTINUE 
@@ -36,7 +58,10 @@ FILE * yyin;
 
 %type <int_val> NUMBER
 %type <str_val> IDENT
-%type <Terminal> FUNCTION BEGIN_PARAMS END_PARAMS BEGIN_LOCALS END_LOCALS BEGIN_BODY END_BODY INTEGER ARRAY OF IF THEN ENDIF ELSE WHILE DO BEGINLOOP ENDLOOP CONTINUE READ WRITE RETURN AND OR NOT TRUE FALSE SUB ADD MULT DIV MOD EQ NEQ LT GT LTE GTE SEMICOLON COLON COMMA L_PAREN R_PAREN L_SQUARE_BRACKET R_SQUARE_BRACKET ASSIGN 
+//%type <Statement> FUNCTION BEGIN_PARAMS END_PARAMS BEGIN_LOCALS END_LOCALS BEGIN_BODY END_BODY INTEGER ARRAY OF IF THEN ENDIF ELSE WHILE DO BEGINLOOP ENDLOOP CONTINUE READ WRITE RETURN AND OR NOT TRUE FALSE SUB ADD MULT DIV MOD EQ NEQ LT GT LTE GTE SEMICOLON COLON COMMA L_PAREN R_PAREN L_SQUARE_BRACKET R_SQUARE_BRACKET ASSIGN term_3 
+
+%type <Statement>  term_3
+//%type <NonTerminal> FUNCTION
 
 %%
 
@@ -288,6 +313,8 @@ term:           SUB term_2{
                     printf("term -> term_2\n");
                   }
                 | term_3{
+                    cout << "term_3:" <<  $1.code->str() << endl;
+                    //printf("TERM_3:%s\n",$1.name);
                     printf("term -> term_3\n");
                   }
                 ;
@@ -304,6 +331,12 @@ term_2:         var{
                 ;
 
 term_3:         IDENT L_PAREN term_31 R_PAREN{
+                    $$.code = new stringstream();
+                    *($$.code) << "my text";
+                    //$$.name = "my test" ;
+                    //$$.name = $1 ;
+                    //strncpy($$.name,$1,256-1);
+                    printf("IDENT:%s\n",$1);
                     printf("term_3 -> IDENT L_PAREN term_31 R_PAREN\n");
                 }
                 ;
@@ -331,15 +364,15 @@ var_2:          L_SQUARE_BRACKET expression R_SQUARE_BRACKET{
             
 %%
 
-int main(int argc, char **argv) {
-    if ( (argc > 1) && (yyin = fopen(argv[1],"r")) == NULL){
-        printf("syntax: %s filename\n", argv[0]);
-        return 1;
-    }
-    yyparse();
-    return 0;
-}
-
+//int main(int argc, char **argv) {
+//    if ( (argc > 1) && (yyin = fopen(argv[1],"r")) == NULL){
+//        printf("syntax: %s filename\n", argv[0]);
+//        return 1;
+//    }
+//    yyparse();
+//    return 0;
+//}
+//
 int yyerror(char *s)
 {
 extern int line_cnt;

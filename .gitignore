@@ -7,3 +7,5 @@ part2/y.tab.h
 
 part2/parser
 part2/out/*
+
+part3/out/*
