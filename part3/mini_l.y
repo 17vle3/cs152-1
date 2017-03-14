@@ -15,7 +15,7 @@ int yylex(void);
     int       int_val;
     char str_val[256];
 
-    enum Type {INT, INT_ARR};
+    //enum Type {INT, INT_ARR};
 
     struct {
         stringstream *code;
@@ -27,17 +27,17 @@ int yylex(void);
        string *place;
        string *offset;
        // branches
-       string *condition;
+       string *op;
        string *begin;
        string *end;
        // type
+       //uint val;
        Type type;
        uint length;
        // idents and vars
        vector<string> *ids;
        //vector<> *vars;
-               
-    } Statement;
+    } Terminal;
 }
 
 %error-verbose
@@ -58,10 +58,14 @@ int yylex(void);
 
 %type <int_val> NUMBER
 %type <str_val> IDENT
-//%type <Statement> FUNCTION BEGIN_PARAMS END_PARAMS BEGIN_LOCALS END_LOCALS BEGIN_BODY END_BODY INTEGER ARRAY OF IF THEN ENDIF ELSE WHILE DO BEGINLOOP ENDLOOP CONTINUE READ WRITE RETURN AND OR NOT TRUE FALSE SUB ADD MULT DIV MOD EQ NEQ LT GT LTE GTE SEMICOLON COLON COMMA L_PAREN R_PAREN L_SQUARE_BRACKET R_SQUARE_BRACKET ASSIGN term_3 
 
-%type <Statement>  term_3
-//%type <NonTerminal> FUNCTION
+
+//%type <Statement> IDENT NUMBER
+//%type <NonTerminal> program decl_loop stmt_loop function function_2 statement statement_1
+
+%type <NonTerminal> program
+%type <Terminal> decl_loop stmt_loop function function_2 declaration declaration_2 declaration_3 statement  statement_1 statement_2   statement_21 statement_3   statement_4   statement_5   statement_51  statement_6   statement_61  bool_exp      bool_exp2     rel_and_exp   rel_and_exp2  relation_exp   relation_exp_s comp          expression    expression_2  mult_expr     mult_expr_2   term          term_2        term_3        term_31       term_32       var           var_2         
+
 
 %%
 
@@ -75,6 +79,8 @@ program:    function program {
             ;
 
 function:   FUNCTION IDENT SEMICOLON BEGIN_PARAMS decl_loop END_PARAMS BEGIN_LOCALS decl_loop END_LOCALS BEGIN_BODY statement SEMICOLON function_2 {
+                //IDENT = function name
+                
                 printf("function -> FUNCTION IDENT SEMICOLON BEGIN_PARAMS decl_loop END_PARAMS BEGIN_LOCALS decl_loop END_LOCALS BEGIN_BODY statement SEMICOLON function_2\n");
             }
             ;
@@ -104,23 +110,54 @@ stmt_loop:  statement SEMICOLON stmt_loop {
             ;
 
 declaration:    IDENT declaration_2 {
-                    printf("declaration -> IDENT declaration_2\n");
+                    //printf("declaration -> IDENT declaration_2\n");
+                    $$.code = $2.code;
+                    $$.type = $2.type;
+                    $$.length = $2.length;
+
+                    if($2.type == INT_ARR){
+                        *($$.code) << ".[] " << $1 << ", " << $2.length << "\n";
+                    }
+                    else if($2.type == INT){
+                        *($$.code) << ". " << $1 << "\n";
+                    }else{printf("================ ERRRR\n");}
+                    cout << "DECL:\n" << $$.code->str() << endl;
+
                 }
                 ;
 
 declaration_2:  COMMA IDENT declaration_2 {
-                    printf("declaration_2 -> COMMA IDENT declaration_2\n");
+                    //printf("declaration_2 -> COMMA IDENT declaration_2\n");
+                    $$.code = $3.code;
+                    $$.type = $3.type;
+                    $$.length = $3.length;
+                    if($3.type == INT_ARR){
+                        *($$.code) << ".[] " << $2 << ", " << $3.length << "\n";
+                    }
+                    else if($3.type == INT){
+                        *($$.code) << ". " << $2 << "\n";
+                    }else{printf("================ ERRRR\n");}
                 }
                 | COLON declaration_3 INTEGER {
-                    printf("declaration_2 -> COLON declaration_3 INTEGER\n");
+                    //printf("declaration_2 -> COLON declaration_3 INTEGER\n");
+                    $$.code = $2.code;
+                    $$.type = $2.type;
+                    $$.length = $2.length;
                 }
                 ;
 
 declaration_3:  ARRAY L_SQUARE_BRACKET NUMBER R_SQUARE_BRACKET OF{
-                    printf("declaration_3 -> ARRAY L_SQUARE_BRACKET NUMBER R_SQUARE_BRACKET OF\n");
+                    $$.code = new stringstream();
+                    $$.type = INT_ARR;
+                    $$.length = $3;
+                    //printf("NUM:%d\n",$3);
+                    //printf("declaration_3 -> ARRAY L_SQUARE_BRACKET NUMBER R_SQUARE_BRACKET OF\n");
                 }
                 | {
-                    printf("declaration_3 -> EPSILON\n");
+                    $$.code = new stringstream();
+                    $$.type = INT;
+                    $$.length = 0;
+                    //printf("declaration_3 -> EPSILON\n");
                   }
                 ;
 
@@ -150,6 +187,8 @@ statement:      statement_1 {
                 }
 
 statement_1:    var ASSIGN expression{
+                    //$$.code = new stringstream();
+                    //*($$.code) << "var = expr";
                     printf("statement -> var ASSIGN expression\n");
                 }
                 ;
@@ -288,20 +327,46 @@ expression_2:   ADD mult_expr expression_2 {
                 ;
 
 mult_expr:      term mult_expr_2{
+                    $$.code = $2.code;
+                    //*$$.code = new stringstream();
+                    // *($$.code) << $2.code << " " << term;
                     printf("mult_expr -> term mult_expr_2\n");
                   }
                 ;
 
-mult_expr_2:    MULT mult_expr{
+mult_expr_2:    MULT term mult_expr_2{
+                    $$.code = $2.code;
+                    //*($$.code) << "*";
+                    if($3.op == NULL){
+                        $$.place = $2.place;
+                        $$.op = new string();
+                        *$$.op = "*";
+                    }
+                    else{
+                        //$3.op temp $2.place $3.place
+                        //$$.place = temp
+                        //$$.op = new string();
+                        //*$$.op = "*";
+
+                        //*($$.code) << ". " << temp << "\n"
+                        //            << *$$.op << " " << temp << ", " << *$2.place << ", " 
+                        //            << *$3.place << "\n";
+                    } 
                     printf("mult_expr_2 -> MULT mult_expr\n");
                   }
-                | DIV mult_expr{
+                | DIV term mult_expr_2{
+                     $$.code = $2.code;
+                    *($$.code) << "/";                   
                     printf("mult_expr_2 -> DIV mult_expr\n");
                   }
-                | MOD mult_expr{
+                | MOD term mult_expr_2{
+                    $$.code = $2.code;
+                    *($$.code) << "%";
                     printf("mult_expr_2 -> MOD mult_expr\n");
                   }
                 |{
+                    $$.code = new stringstream();
+                    $$.op = NULL;
                     printf("mult_expr_2 -> EPSILON\n");
                  }
                 ;
@@ -331,8 +396,9 @@ term_2:         var{
                 ;
 
 term_3:         IDENT L_PAREN term_31 R_PAREN{
+                    cout << "IDENT:" <<  $1 << "\n\n\n\n\n\n";
                     $$.code = new stringstream();
-                    *($$.code) << "my text";
+                    //*($$.code) << "my text";
                     //$$.name = "my test" ;
                     //$$.name = $1 ;
                     //strncpy($$.name,$1,256-1);
@@ -350,19 +416,38 @@ term_32:        COMMA term_31{
                   }
 
 var:            IDENT var_2{
-                    printf("var -> IDENT var_2\n");
+                    //$$.code = 
+                    //printf("var -> IDENT var_2\n");
                 }
                 ;
 
 var_2:          L_SQUARE_BRACKET expression R_SQUARE_BRACKET{
-                    printf("var_2 -> L_SQUARE_BRACKET expression R_SQUARE_BRACKET\n");
+                    //$$.code = new stringstream();
+                    $$.code = $2.code;
+                    //printf("var_2 -> L_SQUARE_BRACKET expression R_SQUARE_BRACKET\n");
                 }
                 |{
-                    printf("var_2 -> EPSILON\n");
+                    $$.code = new stringstream();
+                    //printf("var_2 -> EPSILON\n");
                  }
                 ;
             
 %%
+
+string gen_code(string *res, string op, string *val1, string *val2){
+    if(op == "!"){
+        return op + " " + *res + "," + *val1;
+    }
+    else{
+        return op + " " + *res + "," + *val1 + ","+ *val2;
+    }
+}
+
+string * new_temp(){
+    string * t = new string();
+    *t = "FAKE";
+    return t;
+}
 
 //int main(int argc, char **argv) {
 //    if ( (argc > 1) && (yyin = fopen(argv[1],"r")) == NULL){

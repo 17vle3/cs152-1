@@ -19,4 +19,6 @@
 
 using namespace std;
 
+enum Type {INT,INT_ARR};
+
 #endif
