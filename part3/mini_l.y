@@ -10,6 +10,7 @@ int yyerror(char *s);
 int yylex(void);
 stringstream all_code;
 FILE * myin;
+void print_test(string output);
 %}
 
 %union{
@@ -72,7 +73,8 @@ FILE * myin;
 
 program:    function program {
                 printf("program -> function program\n");
-                cout << "function:\n-------------------\n" << $1.code->str() << "\n==\nprogram:\n-----------\n" << $2.code << endl;
+                print_test("function:\n" + $1.code->str());
+                print_test("program:\n" + $2.code->str());
                 //$2 or program should have all functions excecpt newest one
                 $$.code = $2.code;
                 //*($$.code) << $2.code->str();
@@ -143,7 +145,8 @@ declaration:    IDENT declaration_2 {
                     else if($2.type == INT){
                         *($$.code) << ". " << $1 << "\n";
                     }else{printf("================ ERRRR\n");}
-                    cout << "DECL:\n" << $$.code->str() << endl;
+                    print_test("DECL:\n" + $$.code->str());
+                    //cout << "DECL:\n" << $$.code->str() << endl;
 
                 }
                 ;
@@ -436,13 +439,15 @@ term_2:         var{
                 ;
 
 term_3:         IDENT L_PAREN term_31 R_PAREN{
-                    cout << "IDENT:" <<  $1 << "\n\n\n\n\n\n";
+                    string test = "IDENT:";
+                    test += $1;
+                    print_test(test);
+                    //cout << "IDENT:" <<  $1 << "\n\n\n\n\n\n";
                     $$.code = new stringstream();
                     //*($$.code) << "my text";
                     //$$.name = "my test" ;
                     //$$.name = $1 ;
                     //strncpy($$.name,$1,256-1);
-                    printf("IDENT:%s\n",$1);
                     printf("term_3 -> IDENT L_PAREN term_31 R_PAREN\n");
                 }
                 ;
@@ -485,6 +490,12 @@ var_2:          L_SQUARE_BRACKET expression R_SQUARE_BRACKET{
             
 %%
 
+void print_test(string o){
+    cout << "\n---------TEST-----------\n"
+        << o
+        << "\n----------END -----------\n";
+}
+
 string gen_code(string *res, string op, string *val1, string *val2){
     if(op == "!"){
         return op + " " + *res + "," + *val1;
@@ -507,9 +518,10 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-for(int i = 0; i < argc; ++i){
-            cout << argv[i] << endl;
-        }
+//    for(int i = 0; i < argc; ++i){
+//        cout << argv[i] << endl;
+//    }
+
     yyparse();
 
     //all_code << program_code->str();
