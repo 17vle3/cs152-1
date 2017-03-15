@@ -11,6 +11,12 @@ int yylex(void);
 stringstream all_code;
 FILE * myin;
 void print_test(string output);
+void print_test(stringstream o);
+string gen_code(string *res, string op, string *val1, string *val2);
+string to_string(char* s);
+string to_string(int s);
+int tempi = 0;
+string * new_temp();
 %}
 
 %union{
@@ -77,7 +83,7 @@ program:    function program {
                 print_test("program:\n" + $2.code->str());
                 //$2 or program should have all functions excecpt newest one
                 $$.code = $2.code;
-                //*($$.code) << $2.code->str();
+                //*($$.code) << $1.code->str();
               } 
             | {
                 printf("program -> EPSILON\n");
@@ -145,8 +151,7 @@ declaration:    IDENT declaration_2 {
                     else if($2.type == INT){
                         *($$.code) << ". " << $1 << "\n";
                     }else{printf("================ ERRRR\n");}
-                    print_test("DECL:\n" + $$.code->str());
-                    //cout << "DECL:\n" << $$.code->str() << endl;
+                    //print_test("DECL:\n" + $$.code->str());
 
                 }
                 ;
@@ -346,33 +351,85 @@ comp:           EQ{
 
 expression:     mult_expr expression_2{
                     printf("expression -> mult_expr expression_2\n");
+                    $$.code = $2.code;
+                    if($2.op != NULL && $2.place != NULL)
+                    {                        
+                        $$.place = new_temp();
+                        //printf("%s", $1.place);
+                       *($$.code)<< gen_code($$.place, *$2.op, $1.place, $2.place);
+                    }
+                    //print_test($$.code->str());
+                    print_test($$.code->str());
                   }
                 ;
 
 expression_2:   ADD mult_expr expression_2 {
                     printf("expression_2 -> ADD mult_expr expression_2\n");
+                    $$.code = $2.code;
+                    //*($$.code) << "*";
+                    if($3.op == NULL){
+                        $$.place = $2.place;
+                        $$.op = new string();
+                        *$$.op = "+";
+                    }
+                    else{
+                        //$3.op temp $2.place $3.place
+                        $$.place = new_temp();
+                        $$.op = new string();
+                        *$$.op = "+";
+
+                        *($$.code) << ". " << *$$.place << "\n";
+                        *($$.code) << gen_code($$.place , *$$.op, $2.place, $3.place);
+                    } 
+                    print_test($$.code->str());
                   }
                 | SUB mult_expr expression_2{
                     printf("expression_2 -> SUB mult_expr expression_2\n");
+                    $$.code = $2.code;
+                    //*($$.code) << "*";
+                    if($3.op == NULL){
+                        $$.place = $2.place;
+                        $$.op = new string();
+                        *$$.op = "-";
+                    }
+                    else{
+                        //$3.op temp $2.place $3.place
+                        $$.place = new_temp();
+                        $$.op = new string();
+                        *$$.op = "-";
+
+                        *($$.code) << ". " << *$$.place << "\n";
+                        *($$.code) << gen_code($$.place , *$$.op, $2.place, $3.place);
+                    }
+                    print_test($$.code->str());
                   }
                 | {
                     printf("expression -> EPSILON\n");
                     $$.code = new stringstream();
+                    $$.op = NULL;
                   }
                 ;
 
 mult_expr:      term mult_expr_2{
+                    printf("mult_expr -> term mult_expr_2\n");
                     $$.code = $2.code;
+                    if($2.op != NULL && $2.place != NULL)
+                    {                        
+                        $$.place = new_temp();
+                        //printf("%s", $1.place);
+                       *($$.code)<< gen_code($$.place, *$2.op, $1.place, $2.place);
+                        print_test($$.code->str());
+                    }
+                    //print_test($$.code->str());
                     //*$$.code = new stringstream();
                     // *($$.code) << $2.code << " " << term;
-                    printf("mult_expr -> term mult_expr_2\n");
+                    //print_test($$.code->str());
                   }
                 ;
 
 mult_expr_2:    MULT term mult_expr_2{
                     printf("mult_expr_2 -> MULT mult_expr\n");
-
-                    $$.code = $2.code;
+                    $$.code = $3.code;
                     //*($$.code) << "*";
                     if($3.op == NULL){
                         $$.place = $2.place;
@@ -381,24 +438,41 @@ mult_expr_2:    MULT term mult_expr_2{
                     }
                     else{
                         //$3.op temp $2.place $3.place
-                        //$$.place = temp
-                        //$$.op = new string();
-                        //*$$.op = "*";
+                        $$.place = new_temp();
+                        $$.op = new string();
+                        *$$.op = "*";
 
-                        //*($$.code) << ". " << temp << "\n"
-                        //            << *$$.op << " " << temp << ", " << *$2.place << ", " 
-                        //            << *$3.place << "\n";
+                        *($$.code) << ". " << *$$.place << "\n";
+                        *($$.code) << gen_code($$.place , *$$.op, $2.place, $3.place);
                     } 
+
                   }
                 | DIV term mult_expr_2{
                     printf("mult_expr_2 -> DIV mult_expr\n");
-                    cout << "WARN: TERM CODE IS NULL" << endl;
-                     $$.code = $2.code;
-                    *($$.code) << "/";                   
+                    //cout << "WARN: TERM CODE IS NULL" << endl;
+                     $$.code = $3.code;
+                    if($3.op == NULL){
+                        $$.place = $2.place;
+                        $$.op = new string();
+                        *$$.op = "/";
+                    }
+                    else{
+                        //$3.op temp $2.place $3.place
+                        $$.place = new_temp();
+                        $$.op = new string();
+                        *$$.op = "/";
+
+                        *($$.code) << ". " << *$$.place << "\n";
+                        *($$.code) << gen_code($$.place , *$$.op, $2.place, $3.place);
+                    } 
+                    //if($$.place != NULL)
+                    //print_test("CODE:\n"+ $$.code->str() +"\nplace:" + *$$.place);
+                    print_test($$.code->str());
+                    print_test($3.code->str());
                   }
                 | MOD term mult_expr_2{
                     printf("mult_expr_2 -> MOD mult_expr\n");
-                    $$.code = $2.code;
+                    $$.code = $3.code;
                     *($$.code) << "%";
                   }
                 |{
@@ -411,44 +485,50 @@ mult_expr_2:    MULT term mult_expr_2{
 term:           SUB term_2{
                     printf("term -> SUB term_2\n");
                     $$.code = $2.code;
+                    $$.place = new_temp();
+                    *($$.code) << gen_code($$.place, "*",$2.place, &to_string("-1") );
+                    //print_test($$.code->str());
                   }
                 | term_2{
                     printf("term -> term_2\n");
                     $$.code = $1.code;
+                    $$.place = $1.place;
                   }
                 | term_3{
-                    cout << "term_3:" <<  $1.code->str() << endl;
                     printf("term -> term_3\n");
                     $$.code = $1.code;
+                    $$.place = $1.place;
                   }
                 ;
 
 term_2:         var{
                     printf("term_2 -> var\n");
                     $$.code = $1.code;
+                    $$.place= $1.place;
                   }
                 | NUMBER{
                     printf("term_2 -> NUMBER\n");
                     //TODO: probably save number
                     $$.code = new stringstream();
+                    $$.place = new string();
+                    *$$.place = to_string($1);
+                    //printf("%s", &$$.place);
+                    //cout << "NUMBER: " << *$$.place << "\n" << $1 << endl;
                   }
                 | L_PAREN expression R_PAREN{
                     printf("term_2 -> L_PAREN expression R_PAREN\n");
                     $$.code = $2.code;
+                    $$.place = $2.place;
                   }
                 ;
 
 term_3:         IDENT L_PAREN term_31 R_PAREN{
-                    string test = "IDENT:";
-                    test += $1;
-                    print_test(test);
-                    //cout << "IDENT:" <<  $1 << "\n\n\n\n\n\n";
-                    $$.code = new stringstream();
-                    //*($$.code) << "my text";
-                    //$$.name = "my test" ;
-                    //$$.name = $1 ;
-                    //strncpy($$.name,$1,256-1);
                     printf("term_3 -> IDENT L_PAREN term_31 R_PAREN\n");
+                    //cout << "IDENT:" <<  $1 << "\n\n\n\n\n\n";
+                    $$.code = $3.code;
+                    $$.place = new_temp();
+                    *($$.code) << "call " << $1 << ", " << *$$.place << "\n";
+                    print_test($$.code->str());
                 }
                 ;
 
@@ -456,6 +536,7 @@ term_31:        expression term_32{
                     printf("term_31-> expression term_32\n");
                     //expression followed by comma of term_31
                     $$.code = $2.code;
+                    *($$.code) << "param " << *$1.place << "\n";
                 } 
                 | {
                     printf("term_31 -> EPSILON\n");
@@ -474,16 +555,27 @@ term_32:        COMMA term_31{
 var:            IDENT var_2{
                     printf("var -> IDENT var_2\n");
                     $$.code = $2.code;
+                    if($2.place == NULL){
+                        $$.place = new string();
+                        *$$.place = $1;
+                    }
+                    else{
+                        $$.place = new_temp();
+                        *($$.code) << gen_code($$.place, "=[]", &to_string($1), $2.place);
+                        print_test($$.code->str());
+                    }
                 }
                 ;
 
 var_2:          L_SQUARE_BRACKET expression R_SQUARE_BRACKET{
                     //$$.code = new stringstream();
                     $$.code = $2.code;
+                    $$.place = $2.place;
                     //printf("var_2 -> L_SQUARE_BRACKET expression R_SQUARE_BRACKET\n");
                 }
                 |{
                     $$.code = new stringstream();
+                    $$.place = NULL;
                     //printf("var_2 -> EPSILON\n");
                  }
                 ;
@@ -496,18 +588,38 @@ void print_test(string o){
         << "\n----------END -----------\n";
 }
 
+//void print_test(stringstream &o){
+//    cout << "\n---------TEST-----------\n"
+//        << o.str()
+//        << "\n----------END -----------\n";
+//}
+
 string gen_code(string *res, string op, string *val1, string *val2){
     if(op == "!"){
-        return op + " " + *res + "," + *val1;
+        return op + " " + *res + ", " + *val1 + "\n";
     }
     else{
-        return op + " " + *res + "," + *val1 + ","+ *val2;
+        return op + " " + *res + ", " + *val1 + ", "+ *val2 +"\n";
     }
 }
 
+string to_string(char* s){
+    ostringstream c;
+    c << s;
+    return c.str();
+}
+
+string to_string(int s){
+    ostringstream c;
+    c << s;
+    return c.str();
+}
 string * new_temp(){
     string * t = new string();
-    *t = "FAKE";
+    ostringstream conv;
+    conv << tempi;
+    *t = "__temp"+ conv.str()+"__";
+    tempi++;
     return t;
 }
 
