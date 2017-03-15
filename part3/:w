@@ -21,7 +21,6 @@ string * new_temp();
 string * new_label();
 string go_to(string *s);
 string dec_label(string *s);
-string dec_temp(string *s);
 %}
 
 %union{
@@ -102,8 +101,7 @@ program:    function program {
 function:   FUNCTION IDENT SEMICOLON BEGIN_PARAMS decl_loop END_PARAMS BEGIN_LOCALS decl_loop END_LOCALS BEGIN_BODY statement SEMICOLON function_2 {
                 printf("function -> FUNCTION IDENT SEMICOLON BEGIN_PARAMS decl_loop END_PARAMS BEGIN_LOCALS decl_loop END_LOCALS BEGIN_BODY statement SEMICOLON function_2\n");
                 //$13 or funtion 2, should have entire function code
-                $$.code = $5.code;
-                *($$.code) << $8.code->str() << $11.code->str() << $13.code->str();
+                $$.code = $13.code;
                 //$5 decl_loop should have function params
                 //$8 decl_loop should have function local variables
                 
@@ -115,7 +113,7 @@ function_2: statement SEMICOLON function_2 {
                 //$1 or statement should have line statement
                 //$3 or func_2, should have previous statements
                 $$.code = $3.code;
-                *($$.code) << $1.code->str();
+
               } 
             | END_BODY {
                 printf("function_2 -> END_BODY\n");
@@ -126,22 +124,24 @@ function_2: statement SEMICOLON function_2 {
 
 decl_loop:  declaration SEMICOLON decl_loop {
                     printf("decl_loop -> declaration SEMICOLON decl_loop\n");
-                $$.code = $3.code;
-                *($$.code) << $1.code->str();
+                    //decl_loop = everything before declaration = newest one
+                $$.code = new stringstream();
                 } 
             | {
                 printf("decl_loop -> EPSILON\n");
+                //nothing?
                 $$.code = new stringstream();
               }
             ;
 
 stmt_loop:  statement SEMICOLON stmt_loop {
                 printf("stmt_loop -> statement SEMICOLON stmt_loop\n");
-                $$.code = $3.code;
-                *($$.code) << $1.code->str();
+                $$.code = new stringstream();
+                //stmt_loop everything before and statement = newest
               } 
             | {
                 printf("stmt_loop -> EPSILON\n");
+                //nothing?
                 $$.code = new stringstream();
               }
             ;
@@ -322,13 +322,6 @@ statement_5:    READ var statement_51{
 
 statement_51:   COMMA var statement_51 {
                     printf("statement_51 -> COMMA var statement_51\n");
-                    $$.code = $3.code;
-                    if($2.type == INT){
-                       *($$.code) << ".< " << *$2.place << "\n"; 
-                    }
-                    else{
-                       *($$.code) << ".[]< " << *$2.place << ", " << $2.index << "\n"; 
-                    }
                 }
                 | {
                     printf("statement_51 -> EPSILON\n");
@@ -338,26 +331,11 @@ statement_51:   COMMA var statement_51 {
 
 statement_6:    WRITE var statement_61{
                     printf("statement -> WRITE var statement_61\n");
-                    $$.code = $3.code;
-                    if($2.type == INT){
-                       *($$.code) << ".> " << *$2.place << "\n"; 
-                    }
-                    else{
-                       *($$.code) << ".[]> " << *$2.place << ", " << $2.index << "\n"; 
-                    }
-                    print_test($$.code->str());
                   }
                 ;
 
 statement_61:   COMMA var statement_61{
                     printf("statement_61 -> COMMA var statement_61\n");
-                    $$.code = $3.code;
-                    if($2.type == INT){
-                       *($$.code) << ".> " << *$2.place << "\n"; 
-                    }
-                    else{
-                       *($$.code) << ".[]> " << *$2.place << ", " << $2.index << "\n"; 
-                    }
                   }
                 |{
                     printf("statement_61 -> EPSILON\n");
@@ -372,6 +350,7 @@ bool_exp:       rel_and_exp bool_exp2{
                     if($2.op != NULL && $2.place != NULL)
                     {                        
                         $$.place = new_temp();
+                        //printf("%s", $1.place);
                        *($$.code)<< gen_code($$.place, *$2.op, $1.place, $2.place);
                     }
                     else{
@@ -836,9 +815,6 @@ string go_to(string *s){
 }
 string dec_label(string *s){
    return ": " +*s + "\n"; 
-}
-string dec_temp(string *s){
-   return ". " +*s + "\n"; 
 }
 string * new_temp(){
     string * t = new string();

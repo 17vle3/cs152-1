@@ -58,7 +58,16 @@ if a[i] == 0 then
 write i;
 endif;
 i := i + 1;
-i := -i;
+##ADDED TO PRIMES rEmove later
+if (i > 1) then
+    i := -i;
+else i := i;
+endif;
+i := 1;
+do beginloop
+    i := i -1;
+endloop while (i > 0);
+#######
 endloop;
 endbody
 
