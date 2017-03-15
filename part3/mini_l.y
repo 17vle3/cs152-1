@@ -309,49 +309,88 @@ rel_and_exp2:   AND relation_exp rel_and_exp2{
 
 relation_exp:   relation_exp_s{
                     printf("relation_exp -> relation_exp_s\n");
+                    $$.code = $1.code;
+                    $$.place = $1.place; 
+                    print_test($$.code->str());
                 }
                 | NOT relation_exp_s{
                     printf("relation_exp -> NOT relation_exp_s\n");
+                    $$.code = $2.code;
+                    $$.place = new_temp();
+                    *($$.code) << gen_code($$.place, "!", $2.place, NULL);
+                    print_test($$.code->str());
                 }
                 ;
 
 relation_exp_s: expression comp expression{
                     printf("relation_exp_s -> expression comp expression\n");
+                    $$.code = $1.code;
+                    *($$.code) << $2.code->str();
+                    *($$.code) << $3.code->str();
+                    $$.place = new_temp();
+                    *($$.code) << gen_code($$.place, *$2.op, $1.place, $3.place);
                 }
-                | TRUE{
-                        printf("relation_exp_s -> TRUE\n");
+                | TRUE{                    
+                    printf("relation_exp_s -> TRUE\n");
+                    $$.code = new stringstream();
+                    $$.place = new string();
+                    *$$.place = "1";
                     }
                 | FALSE{
                     printf("relation_exp_s -> FALSE\n");
+                    $$.code = new stringstream();
+                    $$.place = new string();
+                    *$$.place = "0";
                   }
                 | L_PAREN bool_exp R_PAREN{
                     printf("relation_exp_s -> L_PAREN bool_exp R_PAREN\n");
+                    $$.code = $2.code;
+                    $$.place = $2.place;
                 }
                 ;
 
 comp:           EQ{
                     printf("comp -> EQ\n");
+                    $$.code = new stringstream();
+                    $$.op = new string();
+                    *$$.op = "==";
                   }
                 | NEQ{
                     printf("comp -> NEQ\n");
+                    $$.code = new stringstream();
+                    $$.op = new string();
+                    *$$.op = "!=";
                   }
                 | LT{
                     printf("comp -> LT\n");
+                    $$.code = new stringstream();
+                    $$.op = new string();
+                    *$$.op = "<";
                   }
                 | GT{
                     printf("comp -> GT\n");
+                    $$.code = new stringstream();
+                    $$.op = new string();
+                    *$$.op = ">";
                   }
                 | LTE{
                     printf("comp -> LTE\n");
+                    $$.code = new stringstream();
+                    $$.op = new string();
+                    *$$.op = "<=";
                   }
                 | GTE{
                     printf("comp -> GTE\n");
+                    $$.code = new stringstream();
+                    $$.op = new string();
+                    *$$.op = ">=";
                   }
                 ;
 
 expression:     mult_expr expression_2{
                     printf("expression -> mult_expr expression_2\n");
                     $$.code = $2.code;
+                    *($$.code) << $1.code->str();
                     if($2.op != NULL && $2.place != NULL)
                     {                        
                         $$.place = new_temp();
@@ -365,7 +404,8 @@ expression:     mult_expr expression_2{
 
 expression_2:   ADD mult_expr expression_2 {
                     printf("expression_2 -> ADD mult_expr expression_2\n");
-                    $$.code = $2.code;
+                    $$.code = $3.code;
+                    *($$.code) << $2.code->str();
                     //*($$.code) << "*";
                     if($3.op == NULL){
                         $$.place = $2.place;
@@ -381,11 +421,12 @@ expression_2:   ADD mult_expr expression_2 {
                         *($$.code) << ". " << *$$.place << "\n";
                         *($$.code) << gen_code($$.place , *$$.op, $2.place, $3.place);
                     } 
-                    print_test($$.code->str());
+                    //print_test($$.code->str());
                   }
                 | SUB mult_expr expression_2{
                     printf("expression_2 -> SUB mult_expr expression_2\n");
-                    $$.code = $2.code;
+                    $$.code = $3.code;
+                    *($$.code) << $2.code->str();
                     //*($$.code) << "*";
                     if($3.op == NULL){
                         $$.place = $2.place;
@@ -401,7 +442,7 @@ expression_2:   ADD mult_expr expression_2 {
                         *($$.code) << ". " << *$$.place << "\n";
                         *($$.code) << gen_code($$.place , *$$.op, $2.place, $3.place);
                     }
-                    print_test($$.code->str());
+                    //print_test($$.code->str());
                   }
                 | {
                     printf("expression -> EPSILON\n");
@@ -413,12 +454,13 @@ expression_2:   ADD mult_expr expression_2 {
 mult_expr:      term mult_expr_2{
                     printf("mult_expr -> term mult_expr_2\n");
                     $$.code = $2.code;
+                    *($$.code) << $1.code->str();
                     if($2.op != NULL && $2.place != NULL)
                     {                        
                         $$.place = new_temp();
                         //printf("%s", $1.place);
                        *($$.code)<< gen_code($$.place, *$2.op, $1.place, $2.place);
-                        print_test($$.code->str());
+                        //print_test($$.code->str());
                     }
                     //print_test($$.code->str());
                     //*$$.code = new stringstream();
@@ -427,9 +469,11 @@ mult_expr:      term mult_expr_2{
                   }
                 ;
 
+
 mult_expr_2:    MULT term mult_expr_2{
                     printf("mult_expr_2 -> MULT mult_expr\n");
                     $$.code = $3.code;
+                    *($$.code) << $2.code->str();
                     //*($$.code) << "*";
                     if($3.op == NULL){
                         $$.place = $2.place;
@@ -451,6 +495,7 @@ mult_expr_2:    MULT term mult_expr_2{
                     printf("mult_expr_2 -> DIV mult_expr\n");
                     //cout << "WARN: TERM CODE IS NULL" << endl;
                      $$.code = $3.code;
+                    *($$.code) << $2.code->str();
                     if($3.op == NULL){
                         $$.place = $2.place;
                         $$.op = new string();
