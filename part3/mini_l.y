@@ -108,7 +108,17 @@ function:   FUNCTION IDENT SEMICOLON BEGIN_PARAMS decl_loop END_PARAMS BEGIN_LOC
                 printf("function -> FUNCTION IDENT SEMICOLON BEGIN_PARAMS decl_loop END_PARAMS BEGIN_LOCALS decl_loop END_LOCALS BEGIN_BODY statement SEMICOLON function_2\n");
                 //$13 or funtion 2, should have entire function code
                 $$.code = new stringstream(); 
-                *($$.code)  << "func " << $2 << "\n" << $5.code->str() << $8.code->str() << $11.code->str() << $13.code->str();
+                *($$.code)  << "func " << $2 << "\n" << $5.code->str() << $8.code->str();
+                for(int i = 0; i < $5.vars->size(); ++i){
+                    if((*$5.vars)[i].type == INT_ARR){
+                        print_test("ERROROROROROROROROROR");
+                        //*($$.code) << ".[] " << $1 << ", " <<(*$5.vars)[i].length << "\n";
+                    }
+                    else if((*$5.vars)[i].type == INT){
+                        *($$.code) << "= " << *((*$5.vars)[i].place) << ", " << "$"<< to_string(i) << "\n";
+                    }else{printf("================ ERRRR\n");}
+                }
+                 *($$.code) << $11.code->str() << $13.code->str();
                 //$5 decl_loop should have function params
                 //$8 decl_loop should have function local variables
                 
@@ -133,11 +143,16 @@ function_2: statement SEMICOLON function_2 {
 decl_loop:  declaration SEMICOLON decl_loop {
                     printf("decl_loop -> declaration SEMICOLON decl_loop\n");
                 $$.code = $1.code;
+                $$.vars = $1.vars;
+                for( int i = 0; i < $3.vars->size(); ++i){
+                    $$.vars->push_back((*$3.vars)[i]);
+                }
                 *($$.code) << $3.code->str();
                 } 
             | {
                 printf("decl_loop -> EPSILON\n");
                 $$.code = new stringstream();
+                $$.vars = new vector<Var>();
               }
             ;
 
@@ -159,6 +174,13 @@ declaration:    IDENT declaration_2 {
                     $$.length = $2.length;
                     //TODO: add variable to symbol_table
 
+                    $$.vars = $2.vars;
+                    Var v = Var();
+                    v.type = $2.type;
+                    v.length = $2.length;
+                    v.place = new string();
+                    *v.place = $1;
+                    $$.vars->push_back(v);
                     if($2.type == INT_ARR){
                         *($$.code) << ".[] " << $1 << ", " << $2.length << "\n";
                     }
@@ -166,6 +188,10 @@ declaration:    IDENT declaration_2 {
                         *($$.code) << ". " << $1 << "\n";
                     }else{printf("================ ERRRR\n");}
                     //print_test("DECL:\n" + $$.code->str());
+                        print_test(to_string($$.vars->size()));
+                    for(int i = 0; i < $$.vars->size(); ++i){
+                        print_test("type:" + to_string((*$$.vars)[i].type) + "\nlength:" + to_string((*$$.vars)[i].length) + "\nplace:" + *(*$$.vars)[i].place);
+                    }
 
                 }
                 ;
@@ -177,6 +203,12 @@ declaration_2:  COMMA IDENT declaration_2 {
                     $$.length = $3.length;
                     //TODO: add variable to symbol_table
                     $$.vars = $3.vars;
+                    Var v = Var();
+                    v.type = $3.type;
+                    v.length = $3.length;
+                    v.place = new string();
+                    *v.place = $2;
+                    $$.vars->push_back(v);
                     if($3.type == INT_ARR){
                         *($$.code) << ".[] " << $2 << ", " << $3.length << "\n";
                     }
