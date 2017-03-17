@@ -4,8 +4,13 @@ part2/y.output
 part2/y.tab.c
 part2/y.tab.h
 
-
 part2/parser
 part2/out/*
 
 part3/out/*
+part3/parser
+
+part3/lex.yy.c
+part3/y.output
+part3/y.tab.c
+part3/y.tab.h
