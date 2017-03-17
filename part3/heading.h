@@ -21,4 +21,13 @@ using namespace std;
 
 enum Type {INT,INT_ARR};
 
+    struct Var{
+        string *place;
+        string *value;
+        string *offset;
+        //vector
+        Type type;
+        int length;
+        string *index;
+    } ;
 #endif

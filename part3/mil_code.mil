@@ -1,3 +1,4 @@
+func main
 . n
 .[] a, 1000
 . j
@@ -31,82 +32,70 @@
 ?:= __label__3, __temp__5
 := __label__5
 : __label__3
-[]= a, i, 0
 . __temp__6
-+ __temp__6, i, 1
-= i, __temp__6
+=[] __temp__6, a, i
+[]= a, i, 0
+. __temp__7
++ __temp__7, i, 1
+= i, __temp__7
 := __label__4
 : __label__5
 = i, 2
 : __label__12
-. __temp__7
-<= __temp__7, i, sqrt_n
-?:= __label__11, __temp__7
+. __temp__8
+<= __temp__8, i, sqrt_n
+?:= __label__11, __temp__8
 := __label__13
 : __label__11
-. __temp__8
-== __temp__8, a, 0
-?:= __label__9, __temp__8
-: __label__9
 . __temp__9
-+ __temp__9, i, i
-= j, __temp__9
-: __label__7
+=[] __temp__9, a, i
 . __temp__10
-<= __temp__10, j, n
-?:= __label__6, __temp__10
+== __temp__10, __temp__9, 0
+?:= __label__9, __temp__10
+:= __label__10
+: __label__9
+. __temp__11
++ __temp__11, i, i
+= j, __temp__11
+: __label__7
+. __temp__12
+<= __temp__12, j, n
+?:= __label__6, __temp__12
 := __label__8
 : __label__6
+. __temp__13
+=[] __temp__13, a, j
 []= a, j, 1
-. __temp__11
-+ __temp__11, j, i
-= j, __temp__11
+. __temp__14
++ __temp__14, j, i
+= j, __temp__14
 := __label__7
 : __label__8
-:= __label__10
 : __label__10
-. __temp__12
-+ __temp__12, i, 1
-= i, __temp__12
-:= __label__12
-: __label__13
-= i, 2
-: __label__23
-. __temp__13
-<= __temp__13, i, n
-?:= __label__22, __temp__13
-:= __label__24
-: __label__22
-. __temp__14
-== __temp__14, a, 0
-?:= __label__14, __temp__14
-: __label__14
-.> i
-:= __label__15
-: __label__15
 . __temp__15
 + __temp__15, i, 1
 = i, __temp__15
-. __temp__16
-> __temp__16, i, 1
-?:= __label__17, __temp__16
-:= __label__16
+:= __label__12
+: __label__13
+= i, 2
 : __label__17
-. __temp__17
-* __temp__17, i, -1
-= i, __temp__17
+. __temp__16
+<= __temp__16, i, n
+?:= __label__16, __temp__16
 := __label__18
 : __label__16
-= i, i
-: __label__18
-= i, 1
-: __label__19
+. __temp__17
+=[] __temp__17, a, i
 . __temp__18
-- __temp__18, i, 1
-= i, __temp__18
+== __temp__18, __temp__17, 0
+?:= __label__14, __temp__18
+:= __label__15
+: __label__14
+.> i
+: __label__15
 . __temp__19
-> __temp__19, i, 0
-?:= __label__19, __temp__19
-: __label__21
-:= __label__23
-: __label__24
++ __temp__19, i, 1
+= i, __temp__19
+:= __label__17
+: __label__18
+endfunc

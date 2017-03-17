@@ -6,7 +6,7 @@
 //#include <stdio.h>
 //#define YY_NO_UNPUT
 //int yyparse();
-int yyerror(char *s);
+int yyerror(const char* s);
 int yylex(void);
 stringstream *all_code;
 FILE * myin;
@@ -34,10 +34,12 @@ string dec_temp(string *s);
         stringstream *code;
     }NonTerminal;
 
+
     struct {
        stringstream *code;
        //location
        string *place;
+       string *value;
        string *offset;
        // branches
        string *op;
@@ -47,11 +49,11 @@ string dec_temp(string *s);
        // type
        //uint val;
        Type type;
-       uint length;
+       int length;
        string *index;
        // idents and vars
        vector<string> *ids;
-       //vector<> *vars;
+       vector<Var> *vars; 
     } Terminal;
 }
 
@@ -89,8 +91,8 @@ program:    function program {
                 //$2 or program should have all functions excecpt newest one
                 $$.code = $1.code;
                 *($$.code) << $2.code->str();
-                print_test("function:\n" + $1.code->str());
-                print_test("program:\n" + $$.code->str());
+                //print_test("function:\n" + $1.code->str());
+                //print_test("program:\n" + $$.code->str());
 
                 all_code = $$.code;
                 //*($$.code) << $1.code->str();
@@ -105,8 +107,8 @@ program:    function program {
 function:   FUNCTION IDENT SEMICOLON BEGIN_PARAMS decl_loop END_PARAMS BEGIN_LOCALS decl_loop END_LOCALS BEGIN_BODY statement SEMICOLON function_2 {
                 printf("function -> FUNCTION IDENT SEMICOLON BEGIN_PARAMS decl_loop END_PARAMS BEGIN_LOCALS decl_loop END_LOCALS BEGIN_BODY statement SEMICOLON function_2\n");
                 //$13 or funtion 2, should have entire function code
-                $$.code = $5.code;
-                *($$.code) << $8.code->str() << $11.code->str() << $13.code->str();
+                $$.code = new stringstream(); 
+                *($$.code)  << "func " << $2 << "\n" << $5.code->str() << $8.code->str() << $11.code->str() << $13.code->str();
                 //$5 decl_loop should have function params
                 //$8 decl_loop should have function local variables
                 
@@ -124,6 +126,7 @@ function_2: statement SEMICOLON function_2 {
                 printf("function_2 -> END_BODY\n");
                 //nothing?
                 $$.code = new stringstream();
+                *($$.code) << "endfunc\n";
               }
             ;
 
@@ -173,6 +176,7 @@ declaration_2:  COMMA IDENT declaration_2 {
                     $$.type = $3.type;
                     $$.length = $3.length;
                     //TODO: add variable to symbol_table
+                    $$.vars = $3.vars;
                     if($3.type == INT_ARR){
                         *($$.code) << ".[] " << $2 << ", " << $3.length << "\n";
                     }
@@ -185,18 +189,21 @@ declaration_2:  COMMA IDENT declaration_2 {
                     $$.code = $2.code;
                     $$.type = $2.type;
                     $$.length = $2.length;
+                    $$.vars = $2.vars;
                 }
                 ;
 
 declaration_3:  ARRAY L_SQUARE_BRACKET NUMBER R_SQUARE_BRACKET OF{
                     //printf("declaration_3 -> ARRAY L_SQUARE_BRACKET NUMBER R_SQUARE_BRACKET OF\n");
                     $$.code = new stringstream();
+                    $$.vars = new vector<Var>();
                     $$.type = INT_ARR;
                     $$.length = $3;
                 }
                 | {
                     //printf("declaration_3 -> EPSILON\n");
                     $$.code = new stringstream();
+                    $$.vars = new vector<Var>();
                     $$.type = INT;
                     $$.length = 0;
                   }
@@ -245,8 +252,9 @@ statement_1:    var ASSIGN expression{
                     else if($1.type == INT && $3.type == INT_ARR){
                         *($$.code) << gen_code($1.place, "=[]", $1.place, $3.place);
                     }
-                    else if($1.type == INT_ARR && $3.type == INT){
-                        *($$.code) << gen_code($1.place, "[]=", $1.index, $3.place);
+                    else if($1.type == INT_ARR && $3.type == INT && $1.value != NULL){
+                        //*($$.code) << gen_code($1.place, "[]=", $1.index, $3.place);
+                        *($$.code) << gen_code($1.value, "[]=", $1.index, $3.place);
                     }
                     else{
                         cout << "\nERROR var op null:\n" ;
@@ -264,11 +272,12 @@ statement_2:    IF bool_exp THEN stmt_loop statement_21 ENDIF{
                     *($$.code) << $2.code->str() << "?:= " << *$$.begin << ", " <<  *$2.place << "\n";
                     if($5.begin != NULL){                       
                         *($$.code) << go_to($5.begin); 
-                    }    
-                    *($$.code) << dec_label($$.begin)  << $4.code->str() << go_to($$.end);
-                    if($5.begin != NULL){
+                        *($$.code) << dec_label($$.begin)  << $4.code->str() << go_to($$.end);
                         cout << "BEGIN" << endl;
                         *($$.code) << dec_label($5.begin) << $5.code->str();
+                    }
+                    else{
+                        *($$.code) << go_to($$.end)<< dec_label($$.begin)  << $4.code->str();
                     }
                     *($$.code) << dec_label($$.end);
                     //print_test($$.code->str());
@@ -349,7 +358,7 @@ statement_6:    WRITE var statement_61{
                        *($$.code) << ".> " << *$2.place << "\n"; 
                     }
                     else{
-                       *($$.code) << ".[]> " << *$2.place << ", " << $2.index << "\n"; 
+                       *($$.code) << ".[]> " << *$2.value << ", " << *$2.index << "\n"; 
                     }
                     //print_test($$.code->str());
                   }
@@ -363,7 +372,7 @@ statement_61:   COMMA var statement_61{
                        *($$.code) << ".> " << *$2.place << "\n"; 
                     }
                     else{
-                       *($$.code) << ".[]> " << *$2.place << ", " << $2.index << "\n"; 
+                       *($$.code) << ".[]> " << *$2.value << ", " << *$2.index << "\n"; 
                     }
                   }
                 |{
@@ -792,8 +801,15 @@ var:            IDENT var_2{
                         //$$.place = new_temp();
                         //*($$.code) << gen_code($$.place, "=[]", &to_string($1), $2.place);
                         $$.index = $2.index;
-                        $$.place = new string();
-                        *$$.place = $1;
+                        $$.place = new_temp();
+                        string* tmp = new string();
+                        *tmp = $1;
+                        *($$.code) << dec_temp($$.place) << gen_code($$.place, "=[]", tmp,$2.index);
+                        $$.value = new string();
+                        *$$.value = $1;
+                        //*$$.place = $1;
+
+                        //*$$.place = $1;
                         //print_test($$.code->str());
                     }
                 }
@@ -910,7 +926,7 @@ int main(int argc, char **argv) {
 //    return 0;
 //}
 //
-int yyerror(char *s)
+int yyerror(const char *s)
 {
     extern int line_cnt;
     extern int cursor_pos;
