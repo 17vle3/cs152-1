@@ -22,6 +22,7 @@ string * new_label();
 string go_to(string *s);
 string dec_label(string *s);
 string dec_temp(string *s);
+void expression_code( Terminal &DD,  Terminal D2, Terminal D3,string op);
 %}
 
 %union{
@@ -34,27 +35,31 @@ string dec_temp(string *s);
         stringstream *code;
     }NonTerminal;
 
+    struct Terminal Terminal;
 
-    struct {
-       stringstream *code;
-       //location
-       string *place;
-       string *value;
-       string *offset;
-       // branches
-       string *op;
-       string *begin;
-       string *parent;
-       string *end;
-       // type
-       //uint val;
-       Type type;
-       int length;
-       string *index;
-       // idents and vars
-       vector<string> *ids;
-       vector<Var> *vars; 
-    } Terminal;
+
+//    struct {
+//       stringstream *code;
+//       //location
+//       string *place;
+//       string *value;
+//       string *offset;
+//       // branches
+//       string *op;
+//       string *begin;
+//       string *parent;
+//       string *end;
+//       // type
+//       //uint val;
+//       Type type;
+//       int length;
+//       string *index;
+//       // idents and vars
+//       vector<string> *ids;
+//       vector<Var> *vars; 
+//    } Terminal;
+
+
 }
 
 %error-verbose
@@ -193,6 +198,7 @@ declaration_2:  COMMA IDENT declaration_2 {
                     $$.length = $3.length;
                     //TODO: add variable to symbol_table
                     //TODO: check if symbol already exists
+                    //TODO: check if array size <= 0
                     $$.vars = $3.vars;
                     Var v = Var();
                     v.type = $3.type;
@@ -255,6 +261,7 @@ statement:      statement_1 {
                 | CONTINUE{
                     printf("statement -> CONTINUE\n");
                     //TODO: probably add code to jump to start of loop?
+                    //TODO: check if used inside loop
                     $$.code = new stringstream();
                 }
                 | RETURN expression{
@@ -266,7 +273,7 @@ statement:      statement_1 {
 
 statement_1:    var ASSIGN expression{
                     printf("statement -> var ASSIGN expression\n");
-                    //TODO: check symbol table
+                    //TODO: check if var was declared?
                     $$.code = $1.code;
                     *($$.code) << $3.code->str();
                     if($1.type == INT && $3.type == INT){
@@ -414,20 +421,21 @@ bool_exp:       rel_and_exp bool_exp2{
 
 bool_exp2:      OR rel_and_exp bool_exp2{
                     printf("bool_exp2 -> OR rel_and_exp bool_exp2\n");
-                    $$.code = $2.code;
-                    *($$.code) << $3.code->str();
-                    if($3.op == NULL){
-                        $$.place = $2.place;
-                        $$.op = new string();
-                        *$$.op = "||";
-                    }
-                    else{
-                        $$.place = new_temp();
-                        $$.op = new string();
-                        *$$.op = "||";
+                    //$$.code = $2.code;
+                    //*($$.code) << $3.code->str();
+                    //if($3.op == NULL){
+                    //    $$.place = $2.place;
+                    //    $$.op = new string();
+                    //    *$$.op = "||";
+                    //}
+                    //else{
+                    //    $$.place = new_temp();
+                    //    $$.op = new string();
+                    //    *$$.op = "||";
 
-                        *($$.code) << dec_temp($$.place) << gen_code($$.place , *$$.op, $2.place, $3.place);
-                    } 
+                    //    *($$.code) << dec_temp($$.place) << gen_code($$.place , *$$.op, $2.place, $3.place);
+                    //} 
+                    expression_code($$,$2,$3,"||");
 
 
                 }
@@ -456,20 +464,21 @@ rel_and_exp:    relation_exp rel_and_exp2{
 
 rel_and_exp2:   AND relation_exp rel_and_exp2{
                     printf("rel_and_exp2 -> AND relation_exp rel_and_exp2\n");
-                    $$.code = $2.code;
-                    *($$.code) << $3.code->str();
-                    if($3.op == NULL){
-                        $$.place = $2.place;
-                        $$.op = new string();
-                        *$$.op = "&&";
-                    }
-                    else{
-                        $$.place = new_temp();
-                        $$.op = new string();
-                        *$$.op = "&&";
+                    //$$.code = $2.code;
+                    //*($$.code) << $3.code->str();
+                    //if($3.op == NULL){
+                    //    $$.place = $2.place;
+                    //    $$.op = new string();
+                    //    *$$.op = "&&";
+                    //}
+                    //else{
+                    //    $$.place = new_temp();
+                    //    $$.op = new string();
+                    //    *$$.op = "&&";
 
-                        *($$.code) << dec_temp($$.place) << gen_code($$.place , *$$.op, $2.place, $3.place);
-                    } 
+                    //    *($$.code) << dec_temp($$.place) << gen_code($$.place , *$$.op, $2.place, $3.place);
+                    //} 
+                    expression_code($$,$2,$3,"&&");
 
                 }
                 |{
@@ -575,38 +584,40 @@ expression:     mult_expr expression_2{
 
 expression_2:   ADD mult_expr expression_2 {
                     printf("expression_2 -> ADD mult_expr expression_2\n");
-                    $$.code = $2.code;
-                    *($$.code) << $3.code->str();
-                    if($3.op == NULL){
-                        $$.place = $2.place;
-                        $$.op = new string();
-                        *$$.op = "+";
-                    }
-                    else{
-                        $$.place = new_temp();
-                        $$.op = new string();
-                        *$$.op = "+";
+                    //$$.code = $2.code;
+                    //*($$.code) << $3.code->str();
+                    //if($3.op == NULL){
+                    //    $$.place = $2.place;
+                    //    $$.op = new string();
+                    //    *$$.op = "+";
+                    //}
+                    //else{
+                    //    $$.place = new_temp();
+                    //    $$.op = new string();
+                    //    *$$.op = "+";
 
-                        *($$.code)<< dec_temp($$.place) << gen_code($$.place , *$$.op, $2.place, $3.place);
-                    } 
+                    //    *($$.code)<< dec_temp($$.place) << gen_code($$.place , *$$.op, $2.place, $3.place);
+                    //} 
+                    expression_code($$,$2,$3,"+");
 
                   }
                 | SUB mult_expr expression_2{
                     printf("expression_2 -> SUB mult_expr expression_2\n");
-                    $$.code = $2.code;
-                    *($$.code) << $3.code->str();
-                    if($3.op == NULL){
-                        $$.place = $2.place;
-                        $$.op = new string();
-                        *$$.op = "-";
-                    }
-                    else{
-                        $$.place = new_temp();
-                        $$.op = new string();
-                        *$$.op = "-";
+                    //$$.code = $2.code;
+                    //*($$.code) << $3.code->str();
+                    //if($3.op == NULL){
+                    //    $$.place = $2.place;
+                    //    $$.op = new string();
+                    //    *$$.op = "-";
+                    //}
+                    //else{
+                    //    $$.place = new_temp();
+                    //    $$.op = new string();
+                    //    *$$.op = "-";
 
-                        *($$.code)<< dec_temp($$.place) << gen_code($$.place , *$$.op, $2.place, $3.place);
-                    }
+                    //    *($$.code)<< dec_temp($$.place) << gen_code($$.place , *$$.op, $2.place, $3.place);
+                    //}
+                    expression_code($$,$2,$3,"-");
                   }
                 | {
                     printf("expression -> EPSILON\n");
@@ -634,54 +645,58 @@ mult_expr:      term mult_expr_2{
 
 mult_expr_2:    MULT term mult_expr_2{
                     printf("mult_expr_2 -> MULT mult_expr\n");
-                    $$.code = $2.code;
-                    *($$.code) << $3.code->str();
-                    if($3.op == NULL){
-                        $$.place = $2.place;
-                        $$.op = new string();
-                        *$$.op = "*";
-                    }
-                    else{
-                        $$.place = new_temp();
-                        $$.op = new string();
-                        *$$.op = "*";
+                    //$$.code = $2.code;
+                    //*($$.code) << $3.code->str();
+                    //if($3.op == NULL){
+                    //    $$.place = $2.place;
+                    //    $$.op = new string();
+                    //    *$$.op = "*";
+                    //}
+                    //else{
+                    //    $$.place = new_temp();
+                    //    $$.op = new string();
+                    //    *$$.op = "*";
 
-                        *($$.code) << dec_temp($$.place)<< gen_code($$.place , *$$.op, $2.place, $3.place);
-                    } 
+                    //    *($$.code) << dec_temp($$.place)<< gen_code($$.place , *$$.op, $2.place, $3.place);
+                    //} 
+                    expression_code($$,$2,$3,"*");
 
                   }
                 | DIV term mult_expr_2{
                     printf("mult_expr_2 -> DIV mult_expr\n");
-                     $$.code = $2.code;
-                    *($$.code) << $3.code->str();
-                    if($3.op == NULL){
-                        $$.place = $2.place;
-                        $$.op = new string();
-                        *$$.op = "/";
-                    }
-                    else{
-                        $$.place = new_temp();
-                        $$.op = new string();
-                        *$$.op = "/";
+                    // $$.code = $2.code;
+                    //*($$.code) << $3.code->str();
+                    //if($3.op == NULL){
+                    //    $$.place = $2.place;
+                    //    $$.op = new string();
+                    //    *$$.op = "/";
+                    //}
+                    //else{
+                    //    $$.place = new_temp();
+                    //    $$.op = new string();
+                    //    *$$.op = "/";
 
-                        *($$.code)<< dec_temp($$.place) << gen_code($$.place , *$$.op, $2.place, $3.place);
-                    } 
+                    //    *($$.code)<< dec_temp($$.place) << gen_code($$.place , *$$.op, $2.place, $3.place);
+                    //} 
+                    expression_code($$,$2,$3,"/");
+                    print_test($$.code->str());
                   }
                 | MOD term mult_expr_2{
                     printf("mult_expr_2 -> MOD mult_expr\n");
-                     $$.code = $2.code;
-                    *($$.code) << $3.code->str();
-                    if($3.op == NULL){
-                        $$.place = $2.place;
-                        $$.op = new string();
-                        *$$.op = "%";
-                    }
-                    else{
-                        $$.place = new_temp();
-                        $$.op = new string();
-                        *$$.op = "%";
-                        *($$.code)<< dec_temp($$.place) << gen_code($$.place , *$$.op, $2.place, $3.place);
-                    } 
+                    expression_code($$,$2,$3,"%");
+                    // $$.code = $2.code;
+                    //*($$.code) << $3.code->str();
+                    //if($3.op == NULL){
+                    //    $$.place = $2.place;
+                    //    $$.op = new string();
+                    //    *$$.op = "%";
+                    //}
+                    //else{
+                    //    $$.place = new_temp();
+                    //    $$.op = new string();
+                    //    *$$.op = "%";
+                    //    *($$.code)<< dec_temp($$.place) << gen_code($$.place , *$$.op, $2.place, $3.place);
+                    //} 
                   }
                 |{
                     printf("mult_expr_2 -> EPSILON\n");
@@ -711,6 +726,7 @@ term:           SUB term_2{
 
 term_2:         var{
                     printf("term_2 -> var\n");
+                    //TODO: check if var was declared?
                     $$.code = $1.code;
                     $$.place= $1.place;
                     $$.index = $1.index;
@@ -730,6 +746,7 @@ term_2:         var{
 
 term_3:         IDENT L_PAREN term_31 R_PAREN{
                     printf("term_3 -> IDENT L_PAREN term_31 R_PAREN\n");
+                    //TODO: check if var was declared?
                     $$.code = $3.code;
                     $$.place = new_temp();
                     *($$.code) << dec_temp($$.place)<< "call " << $1 << ", " << *$$.place << "\n";
@@ -738,6 +755,7 @@ term_3:         IDENT L_PAREN term_31 R_PAREN{
 
 term_31:        expression term_32{
                     printf("term_31-> expression term_32\n");
+                    //TODO: check if function declared?
                     $$.code = $1.code;
                     *($$.code) << $2.code->str();
                     *($$.code) << "param " << *$1.place << "\n";
@@ -760,6 +778,7 @@ var:            IDENT var_2{
                     printf("var -> IDENT var_2\n");
                     $$.code = $2.code;
                     $$.type = $2.type;
+                    //TODO: check if var was declared?
                     if($2.index == NULL){
                         $$.place = new string();
                         *$$.place = $1;
@@ -777,6 +796,7 @@ var:            IDENT var_2{
                 ;
 
 var_2:          L_SQUARE_BRACKET expression R_SQUARE_BRACKET{
+                    //TODO: check if var was declared?
                     printf("var_2 -> L_SQUARE_BRACKET expression R_SQUARE_BRACKET\n");
                     $$.code = $2.code;
                     $$.place = NULL;
@@ -851,6 +871,24 @@ string * new_label(){
     templ++;
     return t;
 }
+
+void expression_code( Terminal &DD, Terminal D2, Terminal D3, string op){
+    DD.code = D2.code;
+    *(DD.code) << D3.code->str();
+    if(D3.op == NULL){
+        DD.place = D2.place;
+        DD.op = new string();
+        *DD.op = op;
+    }
+    else{
+        DD.place = new_temp();
+        DD.op = new string();
+        *DD.op = op;
+
+        *(DD.code) << dec_temp(DD.place)<< gen_code(DD.place , *DD.op, D2.place, D3.place);
+    } 
+}
+
 
 int main(int argc, char **argv) {
 

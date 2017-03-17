@@ -30,4 +30,28 @@ enum Type {INT,INT_ARR};
         int length;
         string *index;
     } ;
+
+
+    struct Terminal{
+       stringstream *code;
+       //location
+       string *place;
+       string *value;
+       string *offset;
+       // branches
+       string *op;
+       string *begin;
+       string *parent;
+       string *end;
+       // type
+       //uint val;
+       Type type;
+       int length;
+       string *index;
+       // idents and vars
+       vector<string> *ids;
+       vector<Var> *vars; 
+    };
+
+
 #endif
