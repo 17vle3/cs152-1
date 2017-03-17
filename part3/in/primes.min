@@ -58,4 +58,14 @@ beginbody	## main program
        endif;
        i := i + 1;
    endloop;
+
+   ##i := 2;
+   ##while i <= n beginloop
+   ##    if a[i] == 0 then
+   ##        write a[i];
+   ##        i := i+2;
+   ##        continue;
+   ##    endif;
+   ##    i := i+1;
+   ##endloop;
 endbody

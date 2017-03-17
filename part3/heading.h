@@ -19,9 +19,10 @@
 
 using namespace std;
 
-enum Type {INT,INT_ARR};
+enum Type {INT,INT_ARR,FUNC};
 
     struct Var{
+        
         string *place;
         string *value;
         string *offset;
@@ -30,6 +31,12 @@ enum Type {INT,INT_ARR};
         int length;
         string *index;
     } ;
+
+    struct Loop{
+        string *begin;
+        string *parent;
+        string *end;
+    };
 
 
     struct Terminal{
