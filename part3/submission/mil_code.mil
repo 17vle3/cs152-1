@@ -4,11 +4,12 @@ func main
 . j
 . i
 .[] t, 20
-.< i
 .< j
+.< i
 = k, 0
 = n, 20
 : __label__0
+: __label__1
 . __temp__0
 =[] __temp__0, t, k
 []= t, k, k
@@ -29,7 +30,6 @@ func main
 . __temp__5
 =[] __temp__5, t, __temp__4
 .[]> t, __temp__4
-: __label__1
 . __temp__6
 < __temp__6, k, n
 ?:= __label__0, __temp__6
@@ -59,38 +59,40 @@ func main
 []= t, j, __temp__15
 . __temp__16
 =[] __temp__16, t, i
-= k, __temp__16
+=[] k, __temp__16, i
 . __temp__17
 =[] __temp__17, t, i
 . __temp__18
 =[] __temp__18, t, j
-[]= t, i, __temp__18
 . __temp__19
-=[] __temp__19, t, j
+=[] __temp__19, __temp__18, j
+[]= t, i, __temp__19
+. __temp__20
+=[] __temp__20, t, j
 []= t, j, k
 := __label__12
 : __label__10
 : __label__6
-. __temp__20
->= __temp__20, i, j
 . __temp__21
-|| __temp__21, __temp__20, 0
-?:= __label__5, __temp__21
+>= __temp__21, i, j
+. __temp__22
+|| __temp__22, __temp__21, 0
+?:= __label__5, __temp__22
 := __label__7
 : __label__5
-. __temp__22
-+ __temp__22, i, j
 . __temp__23
-+ __temp__23, 1, __temp__22
++ __temp__23, i, j
 . __temp__24
-% __temp__24, __temp__23, 3
-= k, __temp__24
++ __temp__24, 1, __temp__23
 . __temp__25
-- __temp__25, i, 1
-= i, __temp__25
+% __temp__25, __temp__24, 3
+= k, __temp__25
 . __temp__26
-> __temp__26, k, 1
-?:= __label__8, __temp__26
+- __temp__26, i, 1
+= i, __temp__26
+. __temp__27
+> __temp__27, k, 1
+?:= __label__8, __temp__27
 := __label__9
 : __label__8
 := __label__6
@@ -99,33 +101,33 @@ func main
 := __label__6
 : __label__7
 : __label__12
-.> i
-.> j
 .> k
-. __temp__27
-< __temp__27, i, n
+.> j
+.> i
 . __temp__28
->= __temp__28, i, 0
+< __temp__28, i, n
 . __temp__29
-&& __temp__29, __temp__27, __temp__28
-?:= __label__13, __temp__29
+>= __temp__29, i, 0
+. __temp__30
+&& __temp__30, __temp__28, __temp__29
+?:= __label__13, __temp__30
 := __label__14
 : __label__13
-. __temp__30
-=[] __temp__30, t, i
+. __temp__31
+=[] __temp__31, t, i
 .[]> t, i
 : __label__14
-. __temp__31
-< __temp__31, j, n
 . __temp__32
->= __temp__32, j, 0
+< __temp__32, j, n
 . __temp__33
-&& __temp__33, __temp__31, __temp__32
-?:= __label__15, __temp__33
+>= __temp__33, j, 0
+. __temp__34
+&& __temp__34, __temp__32, __temp__33
+?:= __label__15, __temp__34
 := __label__16
 : __label__15
-. __temp__34
-=[] __temp__34, t, j
+. __temp__35
+=[] __temp__35, t, j
 .[]> t, j
 : __label__16
 endfunc

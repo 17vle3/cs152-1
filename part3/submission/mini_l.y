@@ -327,7 +327,6 @@ statement:      statement_1 {
                 }
                 | statement_5 {
                     $$.code = $1.code;
-                    //print_test($$.code->str());
                 }
                 | statement_6 {
                     $$.code = $1.code;
@@ -375,7 +374,6 @@ statement_1:    var ASSIGN expression{
                     else{
                         yyerror("Error: expression is null.");
                     }
-                    //print_test($$.code->str());
                 }
                 ;
 
@@ -454,36 +452,45 @@ statement_4:    DO b_loop BEGINLOOP stmt_loop ENDLOOP WHILE bool_exp{
                     $$.begin = $2.begin;
                     $$.parent = $2.parent;
                     $$.end = $2.end;
-                    *($$.code) << dec_label($$.begin) << $4.code->str() << dec_label($$.parent) << $7.code->str() << "?:= " << *$$.begin << ", " << *$7.place << "\n" << dec_label($$.end);
+                    //$$.begin = new_label();
+                    //$$.parent = new_label();
+                    //$$.end = new_label();
+                    //Loop l = Loop();
+                    //l.parent = $$.parent;
+                    //l.begin = $$.begin;
+                    //l.end = $$.end;
+                    ////cout << "\n\nBEFORE:" << loop_stack.size();
+                    //loop_stack.push(l);
+                    //cout << "\n\nAFTER:" << loop_stack.size();
+                    *($$.code) << dec_label($$.begin) << dec_label($$.parent) << $4.code->str() << $7.code->str() << "?:= " << *$$.begin << ", " << *$7.place << "\n" << dec_label($$.end);
                     loop_stack.pop();
+                    //cout << "\n\nAFTER2:" << loop_stack.size();
                 }
                 ;
 
 statement_5:    READ var statement_51{
-                    printf("statement -> READ var statement_51\n");
+                    //printf("statement -> READ var statement_51\n");
                     $$.code = $2.code;
+                    *($$.code) << $3.code->str();
                     if($2.type == INT){
                        *($$.code) << ".< " << *$2.place << "\n"; 
                     }
                     else{
                        *($$.code) << ".[]< " << *$2.place << ", " << $2.index << "\n"; 
                     }
-                    *($$.code) << $3.code->str();
-                    //print_test($$.code->str());
                 }
                 ;
 
 statement_51:   COMMA var statement_51 {
-                    printf("statement_51 -> COMMA var statement_51\n");
+                    //printf("statement_51 -> COMMA var statement_51\n");
                     $$.code = $2.code;
+                    *($$.code) << $3.code->str();
                     if($2.type == INT){
                        *($$.code) << ".< " << *$2.place << "\n"; 
                     }
                     else{
                        *($$.code) << ".[]< " << *$2.place << ", " << $2.index << "\n"; 
                     }
-                    *($$.code) << $3.code->str();
-                    //print_test($$.code->str());
                 }
                 | {
                     //printf("statement_51 -> EPSILON\n");
@@ -494,26 +501,26 @@ statement_51:   COMMA var statement_51 {
 statement_6:    WRITE var statement_61{
                     //printf("statement -> WRITE var statement_61\n");
                     $$.code = $2.code;
+                    *($$.code) << $3.code->str();
                     if($2.type == INT){
                        *($$.code) << ".> " << *$2.place << "\n"; 
                     }
                     else{
                        *($$.code) << ".[]> " << *$2.value << ", " << *$2.index << "\n"; 
                     }
-                    *($$.code) << $3.code->str();
                   }
                 ;
 
 statement_61:   COMMA var statement_61{
                     //printf("statement_61 -> COMMA var statement_61\n");
                     $$.code = $2.code;
+                    *($$.code) << $3.code->str();
                     if($2.type == INT){
                        *($$.code) << ".> " << *$2.place << "\n"; 
                     }
                     else{
                        *($$.code) << ".[]> " << *$2.value << ", " << *$2.index << "\n"; 
                     }
-                    *($$.code) << $3.code->str();
                   }
                 |{
                     //printf("statement_61 -> EPSILON\n");
@@ -702,7 +709,6 @@ expression:     mult_expr expression_2{
                         $$.place = $1.place;
                         $$.op = $1.op;
                     }
-                    $$.type = INT;
                   }
                 ;
 
