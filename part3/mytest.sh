@@ -4,60 +4,48 @@ files=$(ls in)
 inFolder="in"
 outFolder="out"
 
-
-cat in/mytest.min | parser
-
 test(){
-    local input=$1
-        mil_run mil_code.mil <<< $input > out/mytest.out
-        mil_run submission/mytest.mil <<< $input > out/mytest.real
-        diff -u out/mytest.out out/mytest.real
-
+    local input="$1"
+    local file="$2"
+    echo -e "---- Test $input ----"
+    cat "$inFolder/"$file".min" | parser
+    mil_run mil_code.mil <<< "$input" > "$outFolder/"$file".out"
+    mil_run "$inFolder/"$file".mil" <<< "$input" > "$outFolder/"$file".real"
+    diff -u "$outFolder/"$file".out" "$outFolder/"$file".real"
 }
-test "1 2"
-test "1 2"
-test "1 3"
-test "1 4"
-test "1 5"
 
-#test "1 1"
-test "2 1"
-#test "3 1"
-#test "4 1"
-#test "5 1"
+test_file(){
+    file="$1"
+    echo -e "\n============== $file ============\n"
+    for i in {1..20}
+    do
+        test "$i" "$file"
+    done
+}
 
-#test "1 2"
-#test "2 2"
-#test "3 3"
-#test "4 4"
-#test "5 5"
+test_mytest(){
+    file="mytest"
 
+    echo -e "\n============== $file ============\n"
 
-#ERROR=0
-#
-#while read -r file; do
-#    fileName=${file%.min}
-#    isError=${fileName#error}
-#
-#    echo "test: $fileName"
-#    if [ "$isError" != "$fileName" ];then
-#        #echo "ERROR File"
-#        cat "$inFolder/$file" | parser > "$outFolder/$fileName".output 2>&1
-#    else
-#        cat "$inFolder/$file" | parser > "$outFolder/$fileName".output
-#    fi
-#    #diff -u "$outFolder/$fileName".output "$outFolder/$fileName".tokens > "$outFolder/$fileName".diff
-#    #DIFF=$(cat "$outFolder/$fileName".diff)
-#    #if [ "$DIFF" != "" ];then
-#    #    echo "---------FAILED----------"
-#    #    ERROR=1
-#    #fi
-#
-#    #diff -u "$outFolder/$fileName".output "$outFolder/$fileName".tokens 
-#done <<< "$files"
-#
-##if [ $ERROR -eq 0 ]; then
-##    rm $outfolder/*.diff
-##    rm $outfolder/*.output
-##fi
-##
+    test "1 1" "$file" 
+    test "1 2" "$file"
+    test "1 3" "$file"
+    test "1 4" "$file"
+    test "1 5" "$file"
+
+    test "1 1" "$file"
+    test "2 1" "$file"
+    test "3 1" "$file"
+    test "4 1" "$file"
+    test "5 1" "$file"
+
+    test "1 2" "$file"
+    test "2 2" "$file"
+    test "3 3" "$file"
+    test "4 4" "$file"
+    test "5 5" "$file"
+}
+test_file "primes"
+test_file "fibonacci"
+test_mytest

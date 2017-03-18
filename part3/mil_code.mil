@@ -79,7 +79,7 @@ func main
 := __label__7
 : __label__5
 . __temp__22
-+ __temp__22, i, j
+- __temp__22, i, j
 . __temp__23
 + __temp__23, 1, __temp__22
 . __temp__24

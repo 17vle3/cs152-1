@@ -460,7 +460,7 @@ statement_4:    DO b_loop BEGINLOOP stmt_loop ENDLOOP WHILE bool_exp{
                 ;
 
 statement_5:    READ var statement_51{
-                    printf("statement -> READ var statement_51\n");
+                    //printf("statement -> READ var statement_51\n");
                     $$.code = $2.code;
                     if($2.type == INT){
                        *($$.code) << ".< " << *$2.place << "\n"; 
@@ -474,7 +474,7 @@ statement_5:    READ var statement_51{
                 ;
 
 statement_51:   COMMA var statement_51 {
-                    printf("statement_51 -> COMMA var statement_51\n");
+                    //printf("statement_51 -> COMMA var statement_51\n");
                     $$.code = $2.code;
                     if($2.type == INT){
                        *($$.code) << ".< " << *$2.place << "\n"; 
@@ -724,6 +724,9 @@ expression_2:   ADD mult_expr expression_2 {
                     //} 
                     expression_code($$,$2,$3,"+");
 
+                    //print_test("ADD\n" +$$.code->str() +"\n");
+                    //print_test($$.code->str());
+
                   }
                 | SUB mult_expr expression_2{
                     //printf("expression_2 -> SUB mult_expr expression_2\n");
@@ -742,6 +745,7 @@ expression_2:   ADD mult_expr expression_2 {
                     //    *($$.code)<< dec_temp($$.place) << gen_code($$.place , *$$.op, $2.place, $3.place);
                     //}
                     expression_code($$,$2,$3,"-");
+                    //print_test("SUB\n" +$$.code->str());
                   }
                 | {
                     //printf("expression -> EPSILON\n");
@@ -1010,7 +1014,23 @@ string * new_label(){
     templ++;
     return t;
 }
+                    //printf("expression_2 -> ADD mult_expr expression_2\n");
+                    //$$.code = $2.code;
+                    //*($$.code) << $3.code->str();
+                    //if($3.op == NULL){
+                    //    $$.place = $2.place;
+                    //    $$.op = new string();
+                    //    *$$.op = "+";
+                    //}
+                    //else{
+                    //    $$.place = new_temp();
+                    //    $$.op = new string();
+                    //    *$$.op = "+";
 
+                    //    *($$.code)<< dec_temp($$.place) << gen_code($$.place , *$$.op, $2.place, $3.place);
+                    //} 
+                    // 1 + i - j
+ 
 void expression_code( Terminal &DD, Terminal D2, Terminal D3, string op){
     DD.code = D2.code;
     *(DD.code) << D3.code->str();
@@ -1020,11 +1040,12 @@ void expression_code( Terminal &DD, Terminal D2, Terminal D3, string op){
         *DD.op = op;
     }
     else{
+        //cout << "IN ELSE" << endl;
         DD.place = new_temp();
         DD.op = new string();
         *DD.op = op;
 
-        *(DD.code) << dec_temp(DD.place)<< gen_code(DD.place , *DD.op, D2.place, D3.place);
+        *(DD.code) << dec_temp(DD.place)<< gen_code(DD.place , *D3.op, D2.place, D3.place);
     } 
 }
 
