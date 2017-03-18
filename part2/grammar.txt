@@ -2,7 +2,7 @@
 [non-terminal]
 
 
-[program] -> [function] [program] | (epsilon)
+[program]       -> [function] [program] | (epsilon)
 
 [decl_loop]     -> [declaration] (;) [decl_loop] | (epsilon)
 [stmt_loop]     -> [statement] (;) [stmt_loop] | (epsilon)
