@@ -78,7 +78,7 @@ stack<Loop> loop_stack;
 //%define api.value.type variant
 //%define parse.assert
 
-%token FUNCTION BEGIN_PARAMS END_PARAMS BEGIN_LOCALS END_LOCALS BEGIN_BODY END_BODY
+%token FUNCTION BEGIN_PARAMS ENDPARAMS BEGIN_LOCALS END_LOCALS BEGIN_BODY END_BODY
 %token INTEGER ARRAY OF 
 %token IF THEN ENDIF ELSE WHILE DO BEGINLOOP ENDLOOP CONTINUE 
 %token READ WRITE RETURN
@@ -114,8 +114,8 @@ program:    function program {
               }
             ;
 
-function:   FUNCTION b_func SEMICOLON BEGIN_PARAMS decl_loop END_PARAMS BEGIN_LOCALS decl_loop END_LOCALS BEGIN_BODY statement SEMICOLON function_2 {
-                //printf("function -> FUNCTION IDENT SEMICOLON BEGIN_PARAMS decl_loop END_PARAMS BEGIN_LOCALS decl_loop END_LOCALS BEGIN_BODY statement SEMICOLON function_2\n");
+function:   FUNCTION b_func SEMICOLON BEGIN_PARAMS decl_loop ENDPARAMS BEGIN_LOCALS decl_loop END_LOCALS BEGIN_BODY statement SEMICOLON function_2 {
+                //printf("function -> FUNCTION IDENT SEMICOLON BEGIN_PARAMS decl_loop ENDPARAMS BEGIN_LOCALS decl_loop END_LOCALS BEGIN_BODY statement SEMICOLON function_2\n");
                 //IDENT = $2
                 //decl_loop = $5
                 //decl_loop = $8
